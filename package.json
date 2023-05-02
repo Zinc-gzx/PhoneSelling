@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express-session": "^1.17.3"
+    "express-session": "^1.17.3",
+    "mongoose": "^5.5.2"
   }
 
-  
+
 }
