@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Navbar, Container, Row, Col, FormControl, Button, InputGroup } from 'react-bootstrap';
 
 const SearchBar = () => {
+    const [searchText, setSearchText] = useState('');
 
   return (
     <Navbar expand="sm" variant="light" bg="light">
@@ -13,7 +14,7 @@ const SearchBar = () => {
             placeholder="Search phones..."
             value={searchText}
             />
-            <Button variant="secondary" onClick={handleSearch}>Search</Button>
+            <Button variant="secondary">Search</Button>
             </InputGroup>
             </Col>
         </Row>
