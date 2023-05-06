@@ -1,19 +1,7 @@
 {
-<<<<<<< HEAD
-  "name": "a2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-=======
   "name": "client",
   "version": "0.1.0",
   "private": true,
->>>>>>> ba7b06c5dc83e5bccf9ef6c8c19ac7a04d29ef6f
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
