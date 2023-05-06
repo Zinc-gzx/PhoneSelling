@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import {Navbar, Container, Row, Col, FormControl, Button, InputGroup } from 'react-bootstrap';
+import '../App.css';
+
 
 const SearchBar = () => {
     const [searchText, setSearchText] = useState('');
@@ -14,7 +16,7 @@ const SearchBar = () => {
             placeholder="Search phones..."
             value={searchText}
             />
-            <Button variant="secondary">Search</Button>
+            <Button className="rounded-searchButton">Search</Button>
             </InputGroup>
             </Col>
         </Row>
