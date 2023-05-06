@@ -5,19 +5,19 @@ import SignInButtons from './SignInButtons';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import SearchBar from './SearchBar';
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const NavBar = () => {
   return (
-    <Navbar expand="sm" variant="light" bg="light">
+    <Navbar className='NavBar'>
       <Container>
         <Row>
-          <Col>
-          <Navbar.Brand href="#">OldPhoneDeals</Navbar.Brand>
-          </Col>
-          <Col xs>Second, but unordered</Col>
+        <SearchBar />
+        </Row>
+        <Row>
           <Col>
           <Button variant="secondary">Checkout</Button>
           <SignInButtons />
