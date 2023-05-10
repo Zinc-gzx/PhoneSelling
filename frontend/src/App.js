@@ -1,24 +1,25 @@
 import './App.css';
 import { Login } from "./pages/Login";
 import { Setup } from "./pages/Setup";
-import { Reset } from "./pages/Reset";
+import { ResetEmail } from "./pages/ResetEmail";
+import { ResetPassword } from "./pages/ResetPassword";
+import { Verify } from "./pages/Verify";
 import React from "react";
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route exact path='/' element={<Login />} />
+          <Route exact path='/login' element={<Login />} />
           <Route exact path='/setup' element={<Setup />} />
-          <Route exact path='/reset' element={<Reset />} />
+          <Route exact path='/reset_email' element={<ResetEmail />} />
+          <Route exact path='/reset_password' element={<ResetPassword />} />
+          <Route exact path='/email_verify' element={<Verify />} />
         </Routes>
       </Router>
     </div>
-
-    
-    
   );
 };
 

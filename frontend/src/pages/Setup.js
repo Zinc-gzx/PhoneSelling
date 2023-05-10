@@ -1,6 +1,9 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Link from '@mui/material/Link';
+import Box from '@mui/material/Box';
 
 export const Setup = () => {
     const [email, setEmail] = useState('');
@@ -23,18 +26,16 @@ export const Setup = () => {
     }
 
     return(
-        <> 
-        <label for="email">email</label>
-        <input type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
-        <label for="password">password</label>
-        <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
-        <label for="firstname">firstname</label>
-        <input type="firstname" placeholder="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)}/> 
-        <label for="lastname">lastname</label>
-        <input type="lastname" placeholder="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)}/> 
-        <button onClick={setUp}>Submit</button>
-        <Link to="/">Have a account? Log in now!</Link>
-        </>
+        <div className="setup"> 
+            <Box display="flex" flexDirection={"column"} maxWidth={500} alignItems="center" margin="auto" marginTop={30} marginRight={20}>
+                <TextField id="outlined-basic" label="email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
+                <TextField id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
+                <TextField id="outlined-basic" label="firstname" variant="outlined" type="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)}/> 
+                <TextField id="outlined-basic" label="lastname" variant="outlined"type="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)}/> 
+                <Button variant="contained" onClick={setUp}>Submit</Button>
+                <Link href="/login" underline="hover">{'Have a account? Log in now!'}</Link>
+            </Box>
+        </div>
 
     );
 };

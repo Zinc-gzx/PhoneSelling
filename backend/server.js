@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./app/routes');
@@ -21,7 +23,7 @@ mongoose.connect("mongodb://localhost:27017/COMP5347",{
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: "testing",
+    secret: process.env.APP_SESSION_SECRET,
     cookie: {maxAge: 1800000},
     resave: true,
     saveUninitialized: true

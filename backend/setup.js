@@ -1,18 +1,21 @@
 const USER_DATASET = "./data/datasets/userlist.json";
 
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const saltRounds = 8;
 
 var usersRaw = require(USER_DATASET);
 const User = require("./app/models/User");
 
 var userInstances = [];
+var password = bcrypt.hashSync("Password.", saltRounds);  // Default password for all initial users
 usersRaw.forEach(user => {
     userInstances.push(new User({
         _id: mongoose.Types.ObjectId(user._id.$oid),
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
-        password: user.password,
+        password: password,
     }));
 });
 
