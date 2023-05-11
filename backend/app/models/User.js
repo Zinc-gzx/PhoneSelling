@@ -124,6 +124,17 @@ UserSchema.statics.resetPassword = async function (instance, password, cb) {
     instance.save(cb);
 }
 
+
+UserSchema.statics.editProfile = async function (instance, email, password, firstname, lastname, cb) {
+    password = bcrypt.hashSync(password, Number(process.env.BCRYPT_SALT_ROUNDS));
+    instance.email = email;
+    instance.password = password;
+    instance.firstname = firstname;
+    instance.lastname = lastname;
+    instance.save(cb);
+}
+
+
 const User = mongoose.model("User", UserSchema);
 
 // Poll the password reset requests

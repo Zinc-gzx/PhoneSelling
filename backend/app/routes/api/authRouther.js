@@ -8,5 +8,7 @@ router.route('/verify').get(authController.verify);
 router.route('/reset-password-request').post(authController.resetPasswordRequest);
 router.route('/reset-password').post(authController.resetPassword);
 
+router.route('/user-profile').get(authController.getProfile);
+router.route('/user-profile-edit').post(authController.editProfile);
 
 module.exports = router;

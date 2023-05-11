@@ -154,7 +154,7 @@ module.exports = {
 
     resetPassword: (req, res) => {
         let token = req.body.token;
-        let password = req.body.password
+        let password = req.body.password;
         db.User.getByPasswordResetToken(token, (err, instance) => {
             if (instance) {
                 if (password === undefined) {
@@ -181,6 +181,61 @@ module.exports = {
                 return res.send({
                     status: 4,
                     message: 'Link is incorrect or has expired',
+                });
+            }
+        });
+    },
+
+    getProfile: (req, res) => {
+        let email = req.body.email;
+        db.User.getByEmail(email, (err, instance) => {
+            if (instance) {
+                return res.send({
+                    status: 0,
+                    message: 'ok',
+                    email: instance.email,
+                    password: instance.password,
+                    firstname: instance.firstname,
+                    lastname: instance.lastname,
+                });
+
+            }else {
+                console.log(err);
+                return res.send({
+                    status: -1,
+                    message: 'internal error',
+                });
+            }
+        });
+    },
+
+    editProfile: (req, res) => {
+        let email = req.body.email;
+        let password = req.body.password;
+        let firstname = req.body.firstname;
+        let lastname = req.body.lastname;
+        db.User.getByEmail(email, (err, instance) => {
+            if (instance) {
+                db.User.editProfile(email, password, firstname, lastname, (err, instance) => {
+                    if (instance){
+                        mailService.sendPasswordResetVerificationUserProfile(email);
+                        return res.send({
+                            status: 0,
+                            message: 'ok',
+                        });
+                    }else{
+                        console.log(err);
+                        return res.send({
+                            status: -1,
+                            message: 'internal error',
+                        });
+                    }
+                });
+            }else{
+                console.log(err);
+                return res.send({
+                    status: -1,
+                    message: 'internal error',
                 });
             }
         });
