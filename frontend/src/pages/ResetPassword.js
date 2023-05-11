@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import { useNavigate } from "react-router-dom";
 import {useSearchParams} from 'react-router-dom';
 
-
 export const ResetPassword = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -28,8 +27,9 @@ export const ResetPassword = () => {
 
     return(
         <div className="resetPassword">
-            <Box display="flex" flexDirection={"column"} maxWidth={500} alignItems="center" margin="auto" marginTop={30} marginRight={20} border>
-                <TextField id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
+            <Box display="flex" flexDirection={"column"} maxWidth={400} margin="auto" marginTop={20} marginRight={20} spacing={5} sx={{border: 2, borderRadius: '2%', borderColor: 'grey.500', p:10}}>
+                <h1>Reset Password</h1>
+                <TextField sx={{p:1}} id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
                 <Button variant="contained" onClick={changePassword}>Confirm</Button>
                 <Button variant="contained" onClick={() => {navigate("/login")}}>Cancel</Button>
             </Box>

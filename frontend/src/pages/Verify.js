@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {useSearchParams} from 'react-router-dom';
 import axios from 'axios';
+import Button from '@mui/material/Button';
+import { useNavigate } from "react-router-dom";
 
 export const Verify = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [status, setStatus] = useState('');
+    const navigate = useNavigate();
+
     let token = searchParams.get("token");
     useEffect(() => {
         axios.get('http://localhost:8080/api/auth/verify', {
@@ -22,13 +26,20 @@ export const Verify = () => {
     })
     if (status == "0"){
         return(
-            <>Congraduation! You have successfully activated your account. You can login now!</>
+            <div className="verify">
+                <>Congraduation! You have successfully activated your account. You can login now!</>
+                <Button variant="contained" onClick={() => {navigate("/login")}}>Login</Button>
+            </div>
         );
     }else{
         return(
-            <>Link is incorrect or has expired</>
+            <div className="verifyFailed">
+                <>Link is incorrect or has expired</>
+                <Button variant="contained" onClick={() => {navigate("/login")}}>Login</Button>
+            </div>
         );
     }
-    
+
+
     
 };

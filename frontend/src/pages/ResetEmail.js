@@ -22,8 +22,9 @@ export const ResetEmail = () => {
 
     return(
         <div className="resetEmail">
-            <Box display="flex" flexDirection={"column"} maxWidth={500} alignItems="center" margin="auto" marginTop={30} marginRight={20} border>
-                <TextField id="outlined-basic" label="Email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
+            <Box display="flex" flexDirection={"column"} maxWidth={400} margin="auto" marginTop={20} marginRight={20} spacing={5} sx={{border: 2, borderRadius: '2%', borderColor: 'grey.500', p:10}}>
+                <h1>Forgot Password</h1>
+                <TextField sx={{p:1}} id="outlined-basic" label="Email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
                 <Button variant="contained" onClick={changePasswordRequest}>Confirm</Button>
                 <Button variant="contained" onClick={() => {navigate("/login")}}>Cancel</Button>
             </Box>

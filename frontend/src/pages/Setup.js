@@ -27,13 +27,14 @@ export const Setup = () => {
 
     return(
         <div className="setup"> 
-            <Box display="flex" flexDirection={"column"} maxWidth={500} alignItems="center" margin="auto" marginTop={30} marginRight={20}>
-                <TextField id="outlined-basic" label="email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
-                <TextField id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
-                <TextField id="outlined-basic" label="firstname" variant="outlined" type="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)}/> 
-                <TextField id="outlined-basic" label="lastname" variant="outlined"type="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)}/> 
+            <Box display="flex" flexDirection={"column"} maxWidth={400} margin="auto" marginTop={10} marginRight={20} spacing={5} sx={{border: 2, borderRadius: '2%', borderColor: 'grey.500', p:10}}>
+                <h1>Setup</h1>
+                <TextField sx={{p:1}} id="outlined-basic" label="email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
+                <TextField sx={{p:1}} id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
+                <TextField sx={{p:1}} id="outlined-basic" label="firstname" variant="outlined" type="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)}/> 
+                <TextField sx={{p:1}} id="outlined-basic" label="lastname" variant="outlined"type="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)}/> 
                 <Button variant="contained" onClick={setUp}>Submit</Button>
-                <Link href="/login" underline="hover">{'Have a account? Log in now!'}</Link>
+                <Link sx={{p:1}} href="/login" underline="hover">{'Have a account? Log in now!'}</Link>
             </Box>
         </div>
 

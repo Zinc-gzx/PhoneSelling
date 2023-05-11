@@ -24,12 +24,13 @@ export const Login = () => {
     }
     return(
         <div className="login">
-            <Box display="flex" flexDirection={"column"} maxWidth={500} alignItems="center" margin="auto" marginTop={30} marginRight={20} border>
-                <TextField id="outlined-basic" label="username" variant="outlined" type="username" value={username} onChange={(e) => setUsername(e.target.value)}/> 
-                <TextField id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
+            <Box display="flex" flexDirection={"column"} maxWidth={400} margin="auto" marginTop={20} marginRight={20} spacing={5} sx={{border: 2, borderRadius: '2%', borderColor: 'grey.500', p:10}}>
+                <h1>Login</h1>
+                <TextField sx={{ p: 1 }} id="outlined-basic" label="username" variant="outlined" type="username" value={username} onChange={(e) => setUsername(e.target.value)}/> 
+                <TextField sx={{ p: 1 }} id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
                 <Button variant="contained" onClick={signIn}>Login</Button>
-                <Link href="/reset_email" underline="hover">{'Forgot your password?'}</Link>
                 <Button variant="contained" onClick={() => {navigate("/setup")}}>Setup</Button>
+                <Link sx={{ p: 1 }} href="/reset_email" underline="hover">{'Forgot your password?'}</Link>
             </Box>
         </div>
     );
