@@ -117,5 +117,73 @@ module.exports = {
         });
     },
 
+    resetPasswordRequest: (req, res) => {
+        let email = req.body.email;
+        if (email === undefined) {
+            return res.send({
+                status: 2,
+                message: 'Missing email',
+            });
+        } else if (!EMAIL_PATTERN.test(email)) {
+            return res.send({
+                status: 2,
+                message: 'Malformed email address',
+            });
+        } else {
+            db.User.getActivatedByEmail(email, (err, instance) => {
+                if (instance) {
+                    let token;
+                    crypto.randomBytes(128, (err, buffer) => {
+                        token = buffer.toString('base64');
+                        token = encodeURIComponent(token);
+                        db.User.registerPasswordResetToken(instance, token, (err, instance) => {
+                            if (instance) {
+                                mailService.sendPasswordResetVerification(token, email);
+                            }
+                        });
+                    });
+                }
+            });
+            // Always return success to defend username enumeration attacks.
+            return res.send({
+                status: 0,
+                message: 'ok',
+            });
+        }
+    },
+
+    resetPassword: (req, res) => {
+        let token = req.body.token;
+        let password = req.body.password
+        db.User.getByPasswordResetToken(token, (err, instance) => {
+            if (instance) {
+                if (password === undefined) {
+                    return res.send({
+                        status: 4,
+                        message: 'Missing password',
+                    });
+                }
+                db.User.resetPassword(instance, password, (err, instance) => {
+                    if (instance) {
+                        return res.send({
+                            status: 0,
+                            message: 'ok',
+                        });
+                    } else {
+                        console.log(err);
+                        return res.send({
+                            status: -1,
+                            message: 'internal error',
+                        });
+                    }
+                })
+            } else {
+                return res.send({
+                    status: 4,
+                    message: 'Link is incorrect or has expired',
+                });
+            }
+        });
+    }
     
 };

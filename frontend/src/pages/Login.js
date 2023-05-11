@@ -28,7 +28,7 @@ export const Login = () => {
                 <TextField id="outlined-basic" label="username" variant="outlined" type="username" value={username} onChange={(e) => setUsername(e.target.value)}/> 
                 <TextField id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
                 <Button variant="contained" onClick={signIn}>Login</Button>
-                <Link href="/reset" underline="hover">{'Forgot your password?'}</Link>
+                <Link href="/reset_email" underline="hover">{'Forgot your password?'}</Link>
                 <Button variant="contained" onClick={() => {navigate("/setup")}}>Setup</Button>
             </Box>
         </div>

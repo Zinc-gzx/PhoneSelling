@@ -29,7 +29,15 @@ const UserSchema = new Schema({
         type: Date,
         required: false,
     },
-    
+    // For email verification upon password reset
+    passwordResetToken: {
+        type: String,
+        required: false,
+    },
+    passwordResetExpireAt: {
+        type: Date,
+        required: false,
+    }
 });
 
 // Auto delete 
@@ -90,6 +98,11 @@ UserSchema.statics.getByActivationToken = async function (token, cb) {
     }).exec(cb);
 }
 
+UserSchema.statics.getByPasswordResetToken = async function (token, cb) {
+    return this.findOne({ 
+        passwordResetToken: token,
+    }).exec(cb);
+}
 
 UserSchema.statics.activate = async function (instance, cb) {
     instance.activationExpireAt = undefined;
@@ -97,8 +110,35 @@ UserSchema.statics.activate = async function (instance, cb) {
     instance.save(cb);
 }
 
+UserSchema.statics.registerPasswordResetToken = async function (instance, token, cb) {
+    instance.passwordResetExpireAt = new Date(new Date().getTime() + 10 * 60 * 1000);  // expires in 10 min
+    instance.passwordResetToken = token;
+    instance.save(cb);
+}
+
+UserSchema.statics.resetPassword = async function (instance, password, cb) {
+    password = bcrypt.hashSync(password, Number(process.env.BCRYPT_SALT_ROUNDS));
+    instance.passwordResetExpireAt = undefined;
+    instance.passwordResetToken = undefined;
+    instance.password = password;
+    instance.save(cb);
+}
 
 const User = mongoose.model("User", UserSchema);
 
+// Poll the password reset requests
+if (process.env.PASSWORD_RESET_POLL) {
+    setInterval(() => {
+        User.find({
+            passwordResetExpireAt: {$lte: new Date()},
+        }).exec((err, instances) => {
+            instances.forEach(instance => {
+                instance.passwordResetExpireAt = undefined;
+                instance.passwordResetToken = undefined;
+                instance.save();
+            });
+        })
+    }, 1000);
+}
 
 module.exports = User;
