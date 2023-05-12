@@ -1,0 +1,117 @@
+const phoneModel = require("../models/Phone");
+
+const userModel = require("../models/User");
+
+const getPhoneUserData = async phoneList => {
+	// Initially define a empty obj
+	const list1 = [];
+
+	// Iterate through all the data in the phone table to get seller to match the id in the user table to get all the information about the user
+	for (const phone of phoneList) {
+		// seller id to find user table
+		const user = await userModel.findOne(
+			{ _id: phone.seller },
+			{ password: 0 }
+		);
+		list1.push({
+			...phone._doc,
+			seller: user,
+		});
+	}
+
+	// store reviewer information
+	const list2 = [];
+
+	// Iterate through the list1 array from the first for loop, querying the user table in order to get the reviewer's information
+	for (const phone of list1) {
+		// obtain every phone's information
+		const reviews = [];
+	
+		//reviews array including every comment, and every comment matches with a user id, literate throgh
+		//this array and find user id(matching ecery comment), then to find user table gaining user information
+
+		for (const review of phone.reviews) {
+			// gain user id to find user table
+			const user = await userModel.findOne(
+				{ _id: review.reviewer },
+				{ password: 0 }
+			);
+			reviews.push({
+				...review,
+				reviewer: user,
+			});
+		}
+		list2.push({
+			...phone,
+			reviews,
+		});
+	}
+
+	return list2;
+};
+
+class Controller {
+	async getPhoneListAndBrands(req, res) {
+		try {
+			// Obtain all Phones
+			const phoneList = await phoneModel.find({});
+			
+			// Gain user data
+			const list = await getPhoneUserData(phoneList);
+            console.log(list);
+			// Gain brand
+			const brands = phoneList.map(ele => ele.brand);
+			const set = new Set(brands);
+
+			const phoneListSoldOut = await phoneModel
+                .find({
+                    stock: { $gt: 0 },
+                    disabled: null,
+                })
+                //Use the sort method to sort by stock in ascending order. In this example, {stock: 1} indicates sorting in ascending inventory order.
+                .sort({ stock: 1 })
+                //Use the limit method to limit the number of results returned. In this example, the number of results returned is limited to 5, meaning that only the five phones with the least inventory are returned
+                .limit(5);
+			const listSoldOut = await getPhoneUserData(phoneListSoldOut);
+
+
+			const phoneListBest = await phoneModel.find({
+				disabled: null,
+				reviews: { $exists: true },
+				$where: "this.reviews.length>=2",
+			});
+			const list1 = [];
+			for (const phone of phoneList) {const total = phone.reviews.reduce((pre, cur) => {
+				return pre + cur.rating;
+			}, 0);
+			list1.push({
+				...phone._doc,
+				average: (total / phone.reviews.length).toFixed(2),
+			});
+			}
+			const list2 = list1.sort((a, b) => {
+				return -(a.average - b.average);
+			});
+			const listBest = list2.slice(0,5);
+			res.json({
+				code: 200,
+				msg: "ok",
+				data: { 
+					list,
+					brands: Array.from(set),
+					listSoldOut,
+					listBest,
+				},
+			});
+		} catch (err) {
+			console.error(err);
+			res.json({
+				code: 500,
+				msg: "error",
+				data: {},
+			});
+		}
+	}
+}
+
+module.exports = new Controller();

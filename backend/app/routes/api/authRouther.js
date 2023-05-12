@@ -11,4 +11,5 @@ router.route('/reset-password').post(authController.resetPassword);
 router.route('/user-profile').get(authController.getProfile);
 router.route('/user-profile-edit').post(authController.editProfile);
 
+
 module.exports = router;

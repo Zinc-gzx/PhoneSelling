@@ -8,7 +8,7 @@ const session = require('express-session');
 const PORT = process.env.PORT || 8080;
 const cors = require('cors');
 app.use(cors());
-mongoose.connect("mongodb://localhost:27017/COMP5347",{
+mongoose.connect("mongodb://localhost:27017/COMP5349",{
     useNewUrlParser: true,
     useUnifiedTopology: true, 
     useCreateIndex: true,
