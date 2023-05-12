@@ -77,6 +77,12 @@ UserSchema.statics.getByEmail = async function (email, cb) {
     }).exec(cb);
 };
 
+UserSchema.statics.getById = async function (id, cb) {
+    return this.findOne({ 
+        _id: id,
+    }).exec(cb);
+};
+
 UserSchema.statics.insertInactivated = async function(email, password, firstname, lastname, token, cb) {
     password = bcrypt.hashSync(password, Number(process.env.BCRYPT_SALT_ROUNDS));
     let user = new this({
@@ -125,10 +131,8 @@ UserSchema.statics.resetPassword = async function (instance, password, cb) {
 }
 
 
-UserSchema.statics.editProfile = async function (instance, email, password, firstname, lastname, cb) {
-    password = bcrypt.hashSync(password, Number(process.env.BCRYPT_SALT_ROUNDS));
+UserSchema.statics.editProfile = async function (instance, email, firstname, lastname, cb) {
     instance.email = email;
-    instance.password = password;
     instance.firstname = firstname;
     instance.lastname = lastname;
     instance.save(cb);
