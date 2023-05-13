@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchBar from "../components/SearchBar";
 import { ItemState } from "../components/ItemState";
+import Grid from '@mui/material/Grid';
 
 
 
@@ -36,8 +37,8 @@ export const Home = () => {
     }, []);
 
     const handleClick = () => {
-        const checkoutData = cartArray; // 这是你要传递的数据
-        navigate("/checkout", { state: checkoutData }); // 跳转到Detail组件，并传递数据
+        const checkoutData = cartArray; // get cart data
+        navigate("/checkout", { state: checkoutData });
     };
 
     useEffect(() => {
@@ -45,25 +46,29 @@ export const Home = () => {
     }, [cartArray]);
 
     return (
-        <div>
-            <div>
-                <Button onClick={handleClick} color="inherit">Checkout</Button>
+        <Grid container spacing={2} justifyContent="space-between" alignItems="center">
+            <Grid item>
                 <SearchBar cartArray={cartArray} setCartArray={setCartArray} />
-                <ShoppingCartIcon /><p>Current Quantity: </p>
-                <Button color="inherit">Login</Button>
-            </div>
-            <div>
-                <h2>Sold Out Soon: </h2>
-            </div>
-            <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={soldOut} />
-            <div>
-                <h2>Best Seller: </h2>
-            </div>
-            <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={best} />
+            </Grid>
+            <Grid item style={{ marginRight: '80px' }}>
 
-        </div>
+                <Button onClick={handleClick} variant="contained" size='small'>Checkout</Button>
 
+            </Grid>
 
+            <Grid item xs={12} container justifyContent="flex-start" alignItems="flex-start" style={{marginLeft:'30px'}}>
+                <h2>Sold Out Soon:</h2>
+            </Grid>
+            <Grid item xs={12}>
+                    <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={soldOut} />
+            </Grid>
+            <Grid item xs={12} container justifyContent="flex-start" alignItems="flex-start" style={{marginLeft:'30px'}}>
+                <h2>Best Seller:</h2>
+            </Grid>
+            <Grid item xs={12}>
+                <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={best} />
+            </Grid>
+        </Grid>
     );
 
 };

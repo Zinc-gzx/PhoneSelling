@@ -37,7 +37,7 @@ phoneList.forEach(phone => {
     }));
 });
 
-mongoose.connect("mongodb://localhost:27017/COMP5349",{
+mongoose.connect("mongodb://127.0.0.1:27017/COMP5349",{
     useNewUrlParser: true,
     useUnifiedTopology: true, 
     useCreateIndex: true,

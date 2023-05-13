@@ -85,7 +85,7 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
   
      return (
      <div>
-     <div className="image-container">
+     <div className="image-container" style={{ display: 'flex' }}>
      {phoneList.map((i)=> (
        <div key={i._id}>
         <img onClick={() => handleClickOpen(i._id)} src={`/${i.image}`} style={{ height: "100px", width: "100px" }}/>
