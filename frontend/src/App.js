@@ -10,26 +10,6 @@ import React from "react";
 import { Typography, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <div>
-//         <h1>Old Phone Deals</h1>
-//       </div>
-//       <Router>
-//         <Routes>
-//           <Route path="/checkout" element={<Checkout />} />
-//           <Route exact path='/home' element={<Home />} />
-//           <Route exact path='/login' element={<Login />} />
-//           <Route exact path='/setup' element={<Setup />} />
-//           <Route exact path='/reset_email' element={<ResetEmail />} />
-//           <Route exact path='/reset_password' element={<ResetPassword />} />
-//           <Route exact path='/email_verify' element={<Verify />} />
-//         </Routes>
-//       </Router>
-//     </div>
-//   );
-// };
 function App() {
   return (
     <div className="App">

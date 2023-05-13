@@ -50,7 +50,7 @@ export const Home = () => {
             <Grid item>
                 <SearchBar cartArray={cartArray} setCartArray={setCartArray} />
             </Grid>
-            <Grid item style={{ marginRight: '80px' }}>
+            <Grid item style={{ marginRight: '80px', position: 'fixed', top: '50px', right: '20px' }}>
 
                 <Button onClick={handleClick} variant="contained" size='small'>Checkout</Button>
 

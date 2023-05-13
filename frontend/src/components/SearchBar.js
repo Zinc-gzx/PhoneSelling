@@ -45,6 +45,7 @@ const SearchBar = ({ cartArray, setCartArray }) => {
     setMaxPrice(event.target.value);
   };
   const handleSearch = () => {
+    
     setSearch(true);
   };
 
