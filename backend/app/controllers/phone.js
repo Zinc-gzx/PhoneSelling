@@ -152,25 +152,36 @@ class Controller {
     async updateStock(req, res) {
 		try {
             // Get from frontend
-            let stocks = req.body.stocks;
-            let phoneID = req.body.phoneID;
-            console.log("stock:" ,stocks);
-            console.log("phoneID:" ,phoneID);
+            let phoneFromFrontEnd = req.body.phone;
+            //let phoneID = req.body.phoneID;
+            //console.log("stock:" ,stocks);
+            //console.log("phoneID:" ,phoneFromFrontEnd);
 
             //Update stock controller
-            let phone = await phoneModel.findByIdAndUpdate(
-                phoneID, 
-                { $set: { stock: stocks} }, 
-                { new: true, useFindAndModify: false } 
-            );
+            // let phone = await phoneModel.findByIdAndUpdate(
+            //     phoneFromFrontEnd._id, 
+            //     { $set: { stock: phoneFromFrontEnd.stock - phoneFromFrontEnd.quantity} }, 
+            //     { new: true, useFindAndModify: false } 
+            // );
+
+			let updatePromises = phoneFromFrontEnd.map(async (phone) => {
+				return phoneModel.findByIdAndUpdate(
+					phone._id, 
+					{ $set: { stock: phone.stock - phone.quantity} }, 
+					{ new: true, useFindAndModify: false } 
+				);
+			});
+			
+			let updatedPhones = await Promise.all(updatePromises);
+			
     
-            if (!phone) {
-                return res.status(404).json({
-                    code: 404,
-                    msg: "Phone not found",
-                    data: {},
-                });
-            }
+            // if (!phone) {
+            //     return res.status(404).json({
+            //         code: 404,
+            //         msg: "Phone not found",
+            //         data: {},
+            //     });
+            // }
         } catch (err) {
 			console.error(err);
 			req.json({

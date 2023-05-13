@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Grid, TextField } from "@mui/material";
 import { Link, useLocation } from 'react-router-dom';
-
+import axios from 'axios';
 
 
 
@@ -20,7 +20,7 @@ export const Checkout = () => {
     const location = useLocation();
     const data = location.state;
 
-    const initialPhoneData = data.flat().map((item) => {
+    const initialPhoneData = data.map((item) => {
         return {
             ...item,
             basePrice: item.price, // 将 title 设置为与 _id 相同的值
@@ -30,22 +30,7 @@ export const Checkout = () => {
     console.log(initialPhoneData);
 
     // const submitComment = (e, id) => {
-    //     e.preventDefault();
-    //     // Push to back end
-    //     axios.post('http://localhost:8080/api/home/checkout', {
-    //         stocks:stock,
-    //         phoneID: id
-    //     }).then(function (response) {
-    //         console.log(response);
-    //     }).catch(function (error) {
-    //         alert(error.response.data.message);
-    //     });
-    //     console.log(`Comment: ${stock}`);
-    //     console.log(`Rating: ${rating}`);
-    //     console.log(`phoneID: ${id}`);
-    //     // Reset comment and rating
-    //     setComment("");
-    //     setRating(0);
+    //     
     // };
 
 
@@ -73,7 +58,7 @@ export const Checkout = () => {
 
     if (newQuantity < 1 || newQuantity > maxStock) return; // Do not allow quantity to go below 1 or above stock
     newPhoneData[index].quantity = newQuantity;
-    newPhoneData[index].price = '$' + (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
     setPhoneData(newPhoneData);
   };
 
@@ -92,11 +77,21 @@ export const Checkout = () => {
     if (newQuantity > maxStock) return;
 
     newPhoneData[index].quantity = newQuantity;
-    newPhoneData[index].price = '$' + (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
     setPhoneData(newPhoneData);
   };
 
-  const handlePay = () => {
+  const handlePay = (e) => {
+    e.preventDefault();
+        // Push to back end
+        axios.post('http://localhost:8080/api/home/checkout', {
+            // stocks:stock,
+            phone: phoneData,
+        }).then(function (response) {
+            console.log(response);
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
     setPhoneData([]); // empty data
     console.log('sucess submit');
   };
@@ -112,7 +107,7 @@ export const Checkout = () => {
         padding: '10px',
       }}
     >
-      <Link to="/home">
+      <Link to="/">
         <Button variant="contained" color="primary">
           Back
         </Button>
@@ -159,8 +154,8 @@ export const Checkout = () => {
           </Grid>
         </Grid>
         <Grid container justifyContent="flex-end">
-          <Link to='/home'>
-            <Button variant="contained" color="success" onClick={handlePay}>Submit Order</Button>
+          <Link to='/'>
+            <Button variant="contained" color="success" onClick={(e) => handlePay(e)}>Submit Order</Button>
           </Link>
         </Grid>
       </Grid>

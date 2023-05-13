@@ -21,7 +21,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/checkout" element={<Checkout />} />
-          <Route exact path='/home' element={<Home />} />
+          <Route exact path='/' element={<Home />} />
           <Route exact path='/login' element={<Login />} />
           <Route exact path='/setup' element={<Setup />} />
           <Route exact path='/reset_email' element={<ResetEmail />} />

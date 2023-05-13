@@ -7,6 +7,7 @@ import Rating from "@mui/material/Rating";
 import Button from '@mui/material/Button';
 import axios from 'axios';
 
+  
 
 export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
     const [openDialogId, setOpenDialogId] = useState(null);
@@ -36,25 +37,33 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
     const [quantity, setQuantity] = useState(0);
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState(0);
+    const [quantities, setQuantities] = useState({});
     
     const addToCart = (id) => {
         const temList = phoneList.filter(i => i._id === id);
         console.log(temList[0].stock);
         const inputQuantity = parseInt(prompt("Enter quantity: "), 10);
         if (!isNaN(inputQuantity) && inputQuantity > 0 && temList[0].stock >= inputQuantity) {
+            // temList[0].quantity = inputQuantity;
             temList[0].quantity = inputQuantity;
-            // console.log("temmmmmmmm: ", temList[0]);
-            // console.log("tempList: ", temp);
-            setQuantity(inputQuantity);
+            // setQuantity(inputQuantity);
+            setQuantities({
+                ...quantities,
+                [id]: inputQuantity,  // Update quantity for this item
+            });
         }else{
             alert("No enough stock ! ");
         }
-        // const temp = {
-        //     ...temList[0],
-        //     quantity: inputQuantity, // 添加 quantity 属性
-        // };
+
+        // const updatedPhoneList = phoneList.map(item => {
+        //     if (item._id === id) {
+        //         return { ...item, quantity: inputQuantity }; // update quantity for this item
+        //     }
+        //     return item;
+        // });
+        // setPhoneList(updatedPhoneList);
         // Global Variable for the cart array
-        setCartArray([...cartArray, temList]);
+        setCartArray([...cartArray, ...temList]);
         //console.log(cartArray);
     };
 
@@ -92,7 +101,8 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
         <Dialog open={openDialogId === i._id} onClose={handleClose}>
          <DialogTitle>Detail of Phone</DialogTitle>
          <DialogContent>
-          <div>Current quantity: {quantity}</div>
+          {/* <div>Current quantity: {quantity}</div> */}
+          <div>Current quantity: {quantities[i._id] || 0}</div>
           <div>
             <Button variant="contained" onClick={() => addToCart(i._id)}>
                 Add to Cart
@@ -116,11 +126,21 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
              <p>Rating: {review.rating}</p >
              <div>
               
-              <p>
+              {/* <p>
                {isExpanded ? review.comment : review.comment.substring(0, 200)}
-              </p >{review.comment.length > 200 && !isExpanded && (
+              </p > */}
+              <p>
+                {isExpanded || !review.comment ? review.comment : review.comment.substring(0, 200)}
+              </p >
+
+              {review.comment && review.comment.length > 200 && !isExpanded && (
+                <Button variant="contained" onClick={handleShowMore}>Show More</Button>
+                )}
+
+
+              {/* {review.comment.length > 200 && !isExpanded && (
                <Button variant="contained" onClick={handleShowMore}>Show More</Button>
-              )}
+              )} */}
              </div>
             </div>
            ))
