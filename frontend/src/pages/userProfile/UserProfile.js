@@ -5,9 +5,8 @@ import TextField from '@mui/material/TextField';
 import { Tabs, Tab } from '@mui/material';
 import { TabPanel } from '@mui/lab';
 import { DataGrid } from '@mui/x-data-grid';
-
-
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 export const UserProfile = () => {
     const [email, setEmail] = useState('');
@@ -25,17 +24,22 @@ export const UserProfile = () => {
     const [value, setValue] = useState(0);
     const navigate = useNavigate();
 
+    let id = Cookies.get('id');
     const profile = (e) => {
         e.preventDefault();
         axios.get('http://localhost:8080/api/auth/user-profile',{
-            withCredentials: true
+            params:{
+                id: id
+            }
         }).then(function (response) {
             console.log(response);
-            // setEmail(response.email);
-            // setFirstname(response.firstname);
-            // setLastname(response.lastname);
+            if (response.data.status == '0'){
+                setEmail(response.data.email);
+                setFirstname(response.data.firstname);
+                setLastname(response.data.lastname);
+            }
         }).catch(function (error) {
-            // alert(error.response.data.message);
+            alert(error.response.data.message);
         });
     }
 

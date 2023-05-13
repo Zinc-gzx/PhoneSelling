@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
+import Cookies from 'js-cookie';
 
 export const Login = () => {
     const [username, setUsername] = useState('');
@@ -18,6 +19,9 @@ export const Login = () => {
             password: password
         }).then(function (response) {
             console.log(response);
+            if (response.data.status == "0"){
+                Cookies.set('id', response.data.id);
+            }
         }).catch(function (error) {
             alert(error.response.data.message);
         });

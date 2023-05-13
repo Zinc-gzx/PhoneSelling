@@ -27,6 +27,7 @@ module.exports = {
                     return res.send({
                         status: 0,
                         message: 'ok',
+                        id: instance._id
                     });
                 } else {
                     return res.send({
@@ -188,8 +189,7 @@ module.exports = {
     },
 
     getProfile: (req, res) => {
-        let id = req.session.userId;
-        console.log(id);
+        let id = req.query.id;
         db.User.getById(id, (err, instance) => {
             if (instance) {
                 return res.send({
