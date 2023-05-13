@@ -5,6 +5,7 @@ import { ResetEmail } from "./pages/ResetEmail";
 import { ResetPassword } from "./pages/ResetPassword";
 import { Verify } from "./pages/Verify";
 import { Home } from "./pages/Home";
+import { Checkout } from './pages/Checkout';
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -16,6 +17,7 @@ function App() {
       </div>
       <Router>
         <Routes>
+          <Route path="/checkout" element={<Checkout />} />
           <Route exact path='/home' element={<Home />} />
           <Route exact path='/login' element={<Login />} />
           <Route exact path='/setup' element={<Setup />} />

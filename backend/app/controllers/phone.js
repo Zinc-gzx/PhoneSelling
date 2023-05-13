@@ -58,7 +58,7 @@ class Controller {
 			
 			// Gain user data
 			const list = await getPhoneUserData(phoneList);
-            console.log(list);
+            
 			// Gain brand
 			const brands = phoneList.map(ele => ele.brand);
 			const set = new Set(brands);
@@ -112,6 +112,74 @@ class Controller {
 			});
 		}
 	}
+
+    async updateComment(req, res) {
+		try {
+            let comments = req.body.comments;
+            let ratings = req.body.ratings;
+            let reviewers = req.body.reviewers;
+            let phoneID = req.body.phoneID;
+            console.log("comments:" ,comments);
+            console.log("ratings:" ,ratings);
+            console.log("reviewers:" ,reviewers);
+            console.log("phoneID:" ,phoneID);
+
+
+            let phone = await phoneModel.findByIdAndUpdate(
+                phoneID, 
+                { $push: { reviews: { reviewers, ratings, comments } } }, 
+                { new: true, useFindAndModify: false } 
+            );
+    
+            if (!phone) {
+                return res.status(404).json({
+                    code: 404,
+                    msg: "Phone not found",
+                    data: {},
+                });
+            }
+        } catch (err) {
+			console.error(err);
+			req.json({
+				code: 500,
+				msg: "error",
+				data: {},
+			});
+		}
+    }
+
+
+    async updateStock(req, res) {
+		try {
+            // Get from frontend
+            let stocks = req.body.stocks;
+            let phoneID = req.body.phoneID;
+            console.log("stock:" ,stocks);
+            console.log("phoneID:" ,phoneID);
+
+            //Update stock controller
+            let phone = await phoneModel.findByIdAndUpdate(
+                phoneID, 
+                { $set: { stock: stocks} }, 
+                { new: true, useFindAndModify: false } 
+            );
+    
+            if (!phone) {
+                return res.status(404).json({
+                    code: 404,
+                    msg: "Phone not found",
+                    data: {},
+                });
+            }
+        } catch (err) {
+			console.error(err);
+			req.json({
+				code: 500,
+				msg: "error",
+				data: {},
+			});
+		}
+    }
 }
 
 module.exports = new Controller();
