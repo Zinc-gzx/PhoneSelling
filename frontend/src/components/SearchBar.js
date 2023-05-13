@@ -45,8 +45,15 @@ const SearchBar = ({ cartArray, setCartArray }) => {
     setMaxPrice(event.target.value);
   };
   const handleSearch = () => {
+  
+      if (searchTerm && searchTerm.trim() !== '') {
+        setSearch(true);
+      } else {
+        setSearch(false);
+      }
+      
     
-    setSearch(true);
+
   };
 
   const handleSearchOut = () => {

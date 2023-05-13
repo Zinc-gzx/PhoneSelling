@@ -102,13 +102,17 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
           <p>Brand: {i.brand}</p >
           < img src={`/${i.image}`} style={{ height: "100px", width: "100px" }}/>
           <p>Stock: {i.stock}</p >
-          <p>Seller: {i.seller.firstname} {i.seller.lastname}</p >
+          {/* <p>Seller: {i.seller.firstname} {i.seller.lastname}</p > */}
+          <p>Seller: {i.seller ? i.seller.firstname : 'Unknown'} {i.seller ? i.seller.lastname : ''}</p >
+
           <p>Price: {i.price}</p >
          <div>
           {reviewList.map((item, index) => (
            item.reviews.slice(0, numDisplayed).map((review, i) => (
             <div key={i}>
-             <p>Reviewer: {review.reviewer.firstname} {review.reviewer.lastname}</p >
+             {/* <p>Reviewer: {review.reviewer.firstname} {review.reviewer.lastname}</p > */}
+             <p>Reviewer: {review.reviewer ? review.reviewer.firstname : 'Unknown'} {review.reviewer ? review.reviewer.lastname : ''}</p >
+
              <p>Rating: {review.rating}</p >
              <div>
               
