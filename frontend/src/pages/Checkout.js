@@ -90,9 +90,9 @@ export const Checkout = () => {
       }
       return;
     }
-
+  
     if (newQuantity > maxStock) return;
-
+    console.log('input', newQuantity)
     const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
     
     updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
@@ -103,7 +103,7 @@ export const Checkout = () => {
     // const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
     // updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
 
-    // newPhoneData[index] = updatedPhone;
+    newPhoneData[index] = updatedPhone;
     setPhoneData(newPhoneData);
   };
 
