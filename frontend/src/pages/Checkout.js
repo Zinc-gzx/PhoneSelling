@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Grid, TextField } from "@mui/material";
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { cartArr,catArrWithBasePrice } from "./store";
+import { useRecoilState } from "recoil";
 
 
 
@@ -16,29 +18,38 @@ import axios from 'axios';
 
 
 export const Checkout = () => {
+  const [phoneData, setPhoneData] = useRecoilState(cartArr);
+  console.log(phoneData)
+  const location = useLocation();
+  const data = location.state;
 
-    const location = useLocation();
-    const data = location.state;
+  // const initialPhoneData = data.map((item) => {
+  //   return {
+  //     ...item,
+  //     basePrice: item.price, // 将 title 设置为与 _id 相同的值
+  //   };
+  // });
 
-    const initialPhoneData = data.map((item) => {
-        return {
-            ...item,
-            basePrice: item.price, // 将 title 设置为与 _id 相同的值
-        };
-    });
-    
-    console.log(initialPhoneData);
-
-    // const submitComment = (e, id) => {
-    //     
-    // };
+  // const initialPhoneData = JSON.parse(localStorage.getItem('cart') || '[]');
+  // initialPhoneData.forEach((item) => {
+  //   item.basePrice = item.price;
+  // })
 
 
-  const [phoneData, setPhoneData] = useState(initialPhoneData);
+  //console.log(initialPhoneData);
+
+  // const submitComment = (e, id) => {
+  //     
+  // };
+
+
+  //const [phoneData, setPhoneData] = useState(initialPhoneData);
+
+
   // const history = useHistory();
-  useEffect(() => {
-    console.log("UseEffect: ", phoneData);
-  }, []);
+  // useEffect(() => {
+  //   console.log("UseEffect: ", phoneData);
+  // }, []);
 
   const totalPrice = phoneData.reduce((sum, phone) => {
     return sum + parseFloat(phone.price)
@@ -53,12 +64,18 @@ export const Checkout = () => {
 
   const quantityChange = (index, change) => {
     const newPhoneData = [...phoneData];
+    // const basePrice =  newPhoneData[index].price
     const newQuantity = newPhoneData[index].quantity + change;
     const maxStock = newPhoneData[index].stock || Infinity; // Default to Infinity if stock is not provided
 
     if (newQuantity < 1 || newQuantity > maxStock) return; // Do not allow quantity to go below 1 or above stock
-    newPhoneData[index].quantity = newQuantity;
-    newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    // newPhoneData[index].quantity = newQuantity;
+    // newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
+    
+    updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
+
+    newPhoneData[index] = updatedPhone;
     setPhoneData(newPhoneData);
   };
 
@@ -76,22 +93,31 @@ export const Checkout = () => {
 
     if (newQuantity > maxStock) return;
 
-    newPhoneData[index].quantity = newQuantity;
-    newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
+    
+    updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
+
+    // newPhoneData[index].quantity = newQuantity;
+    // console.log('price');
+    // newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+    // const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
+    // updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
+
+    // newPhoneData[index] = updatedPhone;
     setPhoneData(newPhoneData);
   };
 
   const handlePay = (e) => {
     e.preventDefault();
-        // Push to back end
-        axios.post('http://localhost:8080/api/home/checkout', {
-            // stocks:stock,
-            phone: phoneData,
-        }).then(function (response) {
-            console.log(response);
-        }).catch(function (error) {
-            alert(error.response.data.message);
-        });
+    // Push to back end
+    axios.post('http://localhost:8080/api/home/checkout', {
+      // stocks:stock,
+      phone: phoneData,
+    }).then(function (response) {
+      console.log(response);
+    }).catch(function (error) {
+      alert(error.response.data.message);
+    });
     setPhoneData([]); // empty data
     console.log('sucess submit');
   };
@@ -121,7 +147,7 @@ export const Checkout = () => {
         {phoneData.map((phone, index) => (
           <Grid container item xs={12} key={index} direction="row">
             <Grid item xs>
-                {console.log(phone.title)}
+              {console.log(phone.title)}
               <Typography variant="body1">{phone.title}</Typography>
             </Grid>
             <Grid item xs>

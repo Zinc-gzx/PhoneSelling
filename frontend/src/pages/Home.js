@@ -7,7 +7,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchBar from "../components/SearchBar";
 import { ItemState } from "../components/ItemState";
 import Grid from '@mui/material/Grid';
-
+import { useRecoilState } from "recoil";
+import { cartArr,catArrWithBasePrice } from "./store";
 
 
 export const Home = () => {
@@ -17,7 +18,8 @@ export const Home = () => {
     const [brand, setBrand] = useState({ list: [] });
     const [soldOut, setsSoldOut] = useState([]);
     const [best, setBest] = useState([]);
-    const [cartArray, setCartArray] = useState([]);
+    // const [cartArray, setCartArray] = useState([]);
+    const [cartArray, setCartArray] = useRecoilState(catArrWithBasePrice);
 
     // Get response, all phone data,  from backend
     useEffect(() => {

@@ -9,9 +9,11 @@ import { Checkout } from './pages/Checkout';
 import React from "react";
 import { Typography, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { RecoilRoot } from 'recoil';
 
 function App() {
   return (
+    <RecoilRoot>
     <div className="App">
       <Box sx={{ bgcolor: 'black', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Typography variant="h1" component="div" sx={{ color: 'white', fontSize: '50px', fontWeight: 'bold', fontStyle: 'italic' }}>
@@ -19,17 +21,20 @@ function App() {
         </Typography>
       </Box>
       <Router>
-        <Routes>
-          <Route path="/checkout" element={<Checkout />} />
-          <Route exact path='/' element={<Home />} />
-          <Route exact path='/login' element={<Login />} />
-          <Route exact path='/setup' element={<Setup />} />
-          <Route exact path='/reset_email' element={<ResetEmail />} />
-          <Route exact path='/reset_password' element={<ResetPassword />} />
-          <Route exact path='/email_verify' element={<Verify />} />
-        </Routes>
+
+          <Routes>
+            <Route path="/checkout" element={<Checkout />} />
+            <Route exact path='/' element={<Home />} />
+            <Route exact path='/login' element={<Login />} />
+            <Route exact path='/setup' element={<Setup />} />
+            <Route exact path='/reset_email' element={<ResetEmail />} />
+            <Route exact path='/reset_password' element={<ResetPassword />} />
+            <Route exact path='/email_verify' element={<Verify />} />
+          </Routes>
+
       </Router>
     </div>
+    </RecoilRoot>
   );
 };
 
