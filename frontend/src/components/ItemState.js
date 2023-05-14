@@ -12,6 +12,13 @@ import axios from 'axios';
 export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
     const [openDialogId, setOpenDialogId] = useState(null);
     const [reviewList, setReviewList] = useState([]);
+    const [isExpanded, setIsExpanded] = useState({});
+    const [numDisplayed, setNumDisplayed] = useState({});
+    const [quantity, setQuantity] = useState(0);
+    const [comment, setComment] = useState("");
+    const [rating, setRating] = useState(0);
+    const [quantities, setQuantities] = useState({});
+
   
     const handleClickOpen = (id) => {
      setOpenDialogId(id);
@@ -23,28 +30,36 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
      setOpenDialogId(null);
     };
    
-    const [isExpanded, setIsExpanded] = useState(false);
-    const handleShowMore = () => {
-     setIsExpanded(true);
-    };
-   
-    const [numDisplayed, setNumDisplayed] = useState(3);
-   
-    const handleShowMoreReviews = () => {
-     setNumDisplayed(numDisplayed + 3);
-     };
+    //const [isExpanded, setIsExpanded] = useState(false);
+    // const handleShowMore = () => {
+    //  setIsExpanded(true);
+    // };
 
-    const [quantity, setQuantity] = useState(0);
-    const [comment, setComment] = useState("");
-    const [rating, setRating] = useState(0);
-    const [quantities, setQuantities] = useState({});
+    const handleShowMore = (id) => {
+        setIsExpanded({
+          ...isExpanded,
+          [id]: true,
+        });
+      };
+   
+    //const [numDisplayed, setNumDisplayed] = useState(3);
+   
+    // const handleShowMoreReviews = () => {
+    //  setNumDisplayed(numDisplayed + 3);
+    //  };
+
+    const handleShowMoreReviews = (id) => {
+        setNumDisplayed({
+          ...numDisplayed,
+          [id]: numDisplayed[id] ? numDisplayed[id] + 3 : 3,
+        });
+      };
     
     const addToCart = (id) => {
         const temList = phoneList.filter(i => i._id === id);
         console.log(temList[0].stock);
         const inputQuantity = parseInt(prompt("Enter quantity: "), 10);
         if (!isNaN(inputQuantity) && inputQuantity > 0 && temList[0].stock >= inputQuantity) {
-            // temList[0].quantity = inputQuantity;
             temList[0].quantity = inputQuantity;
             // setQuantity(inputQuantity);
             setQuantities({
@@ -55,16 +70,7 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
             alert("No enough stock ! ");
         }
 
-        // const updatedPhoneList = phoneList.map(item => {
-        //     if (item._id === id) {
-        //         return { ...item, quantity: inputQuantity }; // update quantity for this item
-        //     }
-        //     return item;
-        // });
-        // setPhoneList(updatedPhoneList);
-        // Global Variable for the cart array
         setCartArray([...cartArray, ...temList]);
-        //console.log(cartArray);
     };
 
     const submitComment = (e, id) => {
@@ -118,35 +124,28 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
           <p>Price: {i.price}</p >
          <div>
           {reviewList.map((item, index) => (
-           item.reviews.slice(0, numDisplayed).map((review, i) => (
+           //item.reviews.slice(0, numDisplayed).map((review, i) => (
+            item.reviews.slice(0, numDisplayed[item._id] || 3).map((review, i) => (
             <div key={i}>
              {/* <p>Reviewer: {review.reviewer.firstname} {review.reviewer.lastname}</p > */}
              <p>Reviewer: {review.reviewer ? review.reviewer.firstname : 'Unknown'} {review.reviewer ? review.reviewer.lastname : ''}</p >
 
              <p>Rating: {review.rating}</p >
              <div>
-              
-              {/* <p>
-               {isExpanded ? review.comment : review.comment.substring(0, 200)}
-              </p > */}
-              <p>
-                {isExpanded || !review.comment ? review.comment : review.comment.substring(0, 200)}
-              </p >
-
-              {review.comment && review.comment.length > 200 && !isExpanded && (
-                <Button variant="contained" onClick={handleShowMore}>Show More</Button>
+                {console.log(review)}
+                <p>
+                    {isExpanded[review.reviewer._id] || !review.comment ? review.comment : review.comment.substring(0, 200)}
+                </p >
+                {review.comment && review.comment.length > 200 && !isExpanded[review.reviewer._id] && (
+                    <Button variant="contained" onClick={() => handleShowMore(review.reviewer._id)}>Show More</Button>
                 )}
 
-
-              {/* {review.comment.length > 200 && !isExpanded && (
-               <Button variant="contained" onClick={handleShowMore}>Show More</Button>
-              )} */}
              </div>
             </div>
            ))
           ))}
           <div>
-          <Button variant="contained" onClick={handleShowMoreReviews}>Show More Reviews</Button>
+          <Button variant="contained" onClick={() => handleShowMoreReviews(i._id)}>Show More Reviews</Button>
           </div>
           <div>
 
@@ -171,12 +170,22 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
          </div>
          </DialogContent>
         </Dialog>
-        <br />
+        {/* <br />
         <span>title: {i.title}</span>
         <span style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
          price: {i.price}
         </span>
-        <br />
+        <br /> */}
+        {i.stock > 0 && (
+        <>
+            <br />
+            <span>{i.title}</span>
+            <span style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
+            ${i.price}
+            </span>
+            <br />
+        </>
+        )}
        </div>
       ))}
      </div>
