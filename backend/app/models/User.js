@@ -130,6 +130,12 @@ UserSchema.statics.resetPassword = async function (instance, password, cb) {
     instance.save(cb);
 }
 
+UserSchema.statics.resetPasswordUserProfile = async function (instance, password, cb) {
+    password = bcrypt.hashSync(password, Number(process.env.BCRYPT_SALT_ROUNDS));
+    instance.password = password;
+    instance.save(cb);
+}
+
 
 UserSchema.statics.editProfile = async function (instance, email, firstname, lastname, cb) {
     instance.email = email;

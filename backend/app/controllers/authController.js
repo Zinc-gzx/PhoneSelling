@@ -1,6 +1,7 @@
 const db = require('../models');
 const mailService = require('../mailService');
 const crypto = require('crypto');
+const bcrypt = require("bcrypt");
 
 // Taken from RFC 5322
 const EMAIL_PATTERN = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
@@ -27,7 +28,7 @@ module.exports = {
                     return res.send({
                         status: 0,
                         message: 'ok',
-                        id: instance._id
+                        id: req.session.userId
                     });
                 } else {
                     return res.send({
@@ -212,12 +213,71 @@ module.exports = {
 
     editProfile: (req, res) => {
         let email = req.body.email;
-        let password = req.body.password;
         let firstname = req.body.firstname;
         let lastname = req.body.lastname;
+        let id = req.body.id;
         db.User.getById(id, (err, instance) => {
             if (instance) {
-                db.User.editProfile(email, firstname, lastname, (err, instance) => {
+                db.User.editProfile(instance, email, firstname, lastname, (err, instance) => {
+                    if (instance){
+                        return res.send({
+                            status: 0,
+                            message: 'ok',
+                        });
+                    }else{
+                        console.log(err);
+                        return res.send({
+                            status: -1,
+                            message: 'internal error',
+                        });
+                    }
+                });
+            }else{
+                console.log(err);
+                return res.send({
+                    status: -1,
+                    message: 'internal error',
+                });
+            }
+        });
+    },
+
+    checkPassword: (req, res) => {
+        let id = req.query.id;
+        let password = req.query.password
+        db.User.getById(id, (err, instance) => {
+            if (instance) {
+                bcrypt.compare(password, instance.password).then(function(result) {
+                    if (result){
+                        return res.send({
+                            status: 0,
+                            message: 'ok',
+                        });
+                    }else{
+                        return res.send({
+                            status: 1,
+                            message: 'wrong password',
+                        });
+                    }
+                });
+            
+            }else {
+                console.log(err);
+                return res.send({
+                    status: -1,
+                    message: 'internal error',
+                });
+            }
+        });
+    },
+
+    resetPasswordUserProfile: (req, res) => {
+        let id = req.body.id;
+        let password = req.body.password;
+        db.User.getById(id, (err, instance) => {
+            if (instance) {
+                let email = instance.email;
+                db.User.resetPasswordUserProfile(instance, password, (err, instance) => {
                     if (instance){
                         mailService.sendPasswordResetVerificationUserProfile(email);
                         return res.send({
@@ -240,6 +300,7 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+
     
 };

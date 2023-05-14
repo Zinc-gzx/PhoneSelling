@@ -10,5 +10,7 @@ router.route('/reset-password').post(authController.resetPassword);
 
 router.route('/user-profile').get(authController.getProfile);
 router.route('/user-profile-edit').post(authController.editProfile);
+router.route('/check-password').get(authController.checkPassword);
+router.route('/reset-password-user-profile').post(authController.resetPasswordUserProfile);
 
 module.exports = router;
