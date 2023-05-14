@@ -6,5 +6,4 @@ const phoneRoute = require("./phoneRouther")
 router.use("/auth", authRoute);
 router.use("/home", phoneRoute);
 
-
 module.exports = router;

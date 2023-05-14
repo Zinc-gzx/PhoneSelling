@@ -23,9 +23,11 @@ module.exports = {
             db.User.authenticate(email, password, (err, instance) => {
                 if (instance) {
                     req.session.userId = instance._id;
+                    // console.log(req.session.userId);
                     return res.send({
                         status: 0,
                         message: 'ok',
+                        id: instance._id
                     });
                 } else {
                     return res.send({
@@ -187,14 +189,13 @@ module.exports = {
     },
 
     getProfile: (req, res) => {
-        let email = req.body.email;
-        db.User.getByEmail(email, (err, instance) => {
+        let id = req.query.id;
+        db.User.getById(id, (err, instance) => {
             if (instance) {
                 return res.send({
                     status: 0,
                     message: 'ok',
                     email: instance.email,
-                    password: instance.password,
                     firstname: instance.firstname,
                     lastname: instance.lastname,
                 });
@@ -214,9 +215,9 @@ module.exports = {
         let password = req.body.password;
         let firstname = req.body.firstname;
         let lastname = req.body.lastname;
-        db.User.getByEmail(email, (err, instance) => {
+        db.User.getById(id, (err, instance) => {
             if (instance) {
-                db.User.editProfile(email, password, firstname, lastname, (err, instance) => {
+                db.User.editProfile(email, firstname, lastname, (err, instance) => {
                     if (instance){
                         mailService.sendPasswordResetVerificationUserProfile(email);
                         return res.send({
