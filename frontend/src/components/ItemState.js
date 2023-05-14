@@ -130,7 +130,12 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
              {/* <p>Reviewer: {review.reviewer.firstname} {review.reviewer.lastname}</p > */}
              <p>Reviewer: {review.reviewer ? review.reviewer.firstname : 'Unknown'} {review.reviewer ? review.reviewer.lastname : ''}</p >
 
-             <p>Rating: {review.rating}</p >
+             {/* <p>Rating: {review.rating}</p > */}
+
+             <Rating
+                name="simple-controlled"
+                value={review.rating}
+            />
              <div>
                 {console.log(review)}
                 <p>
@@ -170,12 +175,6 @@ export const ItemState = ({cartArray, setCartArray, phoneList}) =>{
          </div>
          </DialogContent>
         </Dialog>
-        {/* <br />
-        <span>title: {i.title}</span>
-        <span style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
-         price: {i.price}
-        </span>
-        <br /> */}
         {i.stock > 0 && (
         <>
             <br />
