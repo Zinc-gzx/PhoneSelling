@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import {useState, useEffect} from "react";
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Tabs, Tab, Box } from '@mui/material';
-import { TabPanel } from '@mui/lab';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
-import { DataGridPro, useGridApiRef } from '@mui/x-data-grid-pro';
-
 
 export const UserProfile = () => {
     const [email, setEmail] = useState('');
@@ -16,38 +14,40 @@ export const UserProfile = () => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [newPassword, setnewPassword] = useState('');
-    const [passwordVerify, setPasswordVerify] = useState(false);
 
     const [title, setTitle] = useState('');
     const [brand, setBrand] = useState('');
     const [stock, setStock] = useState(0);
     const [price, setPrice] = useState(0.00);
-    const [checked, setChecked] = useState(true);
+    const [selectedPhoneRows, setSelectedPhoneRows] = useState([]);
+    const [selectedCommentRows, setSelectedCommentRows] = useState([]);
 
     const [editStatus, setEditStatus] = useState(true);
     const [value, setValue] = useState(0);
     const navigate = useNavigate();
+    const [tabValue, setTabValue] = useState(0);
+
 
     let id = Cookies.get('id');
-    //get profile
-    const profile = (e) => {
-        e.preventDefault();
-        axios.get('http://localhost:8080/api/auth/user-profile',{
-        params:{
-            id: id
+    useEffect = () => {
+        if (email === "") {
+            axios.get('http://localhost:8080/api/auth/user-profile',{
+                params:{
+                    id: id
+                }
+            }).then(function (response) {
+                if (response.data.status == '0'){
+                    setEmail(response.data.email);
+                    setFirstname(response.data.firstname);
+                    setLastname(response.data.lastname);
+                }
+            }).catch(function (error) {
+                // alert(error.response.data.message);
+            });
         }
-        }).then(function (response) {
-            console.log(response);
-            if (response.data.status == '0'){
-                setEmail(response.data.email);
-                setFirstname(response.data.firstname);
-                setLastname(response.data.lastname);
-            }
-        }).catch(function (error) {
-            alert(error.response.data.message);
-        });
-
+        
     }
+    //get profile
 
     const edit = (e) => {
         setEditStatus(false);
@@ -71,8 +71,7 @@ export const UserProfile = () => {
         });
     }
     //change password
-    const changePasswordSubmit = (e) => {
-        e.preventDefault();
+    const changePasswordSubmit = () => {
         axios.get('http://localhost:8080/api/auth/check-password', {
             params:{
                 password: password,
@@ -81,32 +80,20 @@ export const UserProfile = () => {
         }).then(function (response){
             console.log(response);
             if (response.data.status == '0'){
-                setPasswordVerify(true);
-                if (passwordVerify){
-                    axios.post('http://localhost:8080/api/auth/reset-password-user-profile', {
-                        id: id,
-                        password: newPassword
-                    }).then(function (response) {
-                        console.log(response);
-                    }).catch(function (error) {
-                        alert(error.response.data.message);
-                    });
-                }
+                axios.post('http://localhost:8080/api/auth/reset-password-user-profile', {
+                    id: id,
+                    password: newPassword
+                }).then(function (response) {
+                    console.log(response);
+                }).catch(function (error) {
+                    alert(error.response.data.message);
+                });
             }
         }).catch(function (error) {
             alert(error.response.data.message);
         });
       
     }
-
-    
-
-    //mange listing
-    let idCounter = 0;
-    const createRow = () => {
-        idCounter += 1;
-        return { id: idCounter, title: title, brand: brand, stock: stock, price: price };
-    };
 
     const phoneColumns = [
         { field: 'id', headerName: 'ID', width: 70 },
@@ -116,126 +103,253 @@ export const UserProfile = () => {
         { field: 'price', headerName: 'Price', type: 'number', width: 90 }
     ];
 
-    const [phoneRows, setRows] = useState(() => [
+    const [phoneRows, setPhoneRows] = useState(() => [
         // createRow(),
     ]);
 
+    const [commentRows, setCommentRows] = useState(() => [
+        // createRow(),
+    ]);
+
+    let responsePhoneList = [];
+
+    const listing = (e) => {
+        axios.get('http://localhost:8080/api/userProfile/listing',{
+            params:{
+                id: id
+            }
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+                response.data.phones.map((phone, index) => {
+                    responsePhoneList.push({
+                        id: index+1,
+                        title: phone.title,
+                        brand: phone.brand,
+                        stock: phone.stock,
+                        price: phone.price,
+                        phone_id: phone._id
+                    });
+                });
+                setPhoneRows(responsePhoneList);
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
+    }
+
+    const commentColumns = [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'reviewer', headerName: 'Reviewer', width: 150 },
+        { field: 'rating', headerName: 'Rating', width: 70 },
+        { field: 'comment', headerName: 'Comment', width: 500 },
+    ];
+
+    let responseCommentList = [];
+
+    const comment = (e) => {
+        axios.get('http://localhost:8080/api/userProfile/listing',{
+            params:{
+                id: id
+            }
+        }).then(function (response) {
+            if (response.data.status == '0'){
+                response.data.phones.map((phone, index) => {
+                    let amount = 0;
+                    phone.reviews.map((review, index) => {
+                        responseCommentList.push({
+                            id: index+1,
+                            reviewer: review.reviewer,
+                            rating: review.rating,
+                            comment: review.comment,
+                            phone_id: phone._id,
+                            amount: amount
+                        });
+                        amount+=1;
+                    })
+                    
+                });
+                setCommentRows(responseCommentList);
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
+    }
+
     const handleAddRow = () => {
-        setRows((prevRows) => [...prevRows, createRow()]);
+        axios.post('http://localhost:8080/api/userProfile/add-phone', {
+            id: id,
+            title: title,
+            brand: brand,
+            stock: stock,
+            price: price
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == "0"){
+                let newRow = {
+                    id: phoneRows.length+1, title: title, brand: brand, stock: stock, price: price, phone_id: response.data.phones._id
+                }
+                setPhoneRows((prevRows) => [...prevRows, newRow]);
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
+
+
     };
 
+
     const handleDeleteRow = () => {
-        setRows((prevRows) => {
-          const rowToDeleteIndex = 0;
-          console.log(checked);
-
-          return [
-            ...phoneRows.slice(0, rowToDeleteIndex),
-            ...phoneRows.slice(rowToDeleteIndex + 1),
-          ];
+        axios.post('http://localhost:8080/api/userProfile/delete-phone',{
+            _id: selectedPhoneRows[0].phone_id
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+            
+                const remainingRows = phoneRows.filter(
+                    (row) => !selectedPhoneRows.find((selectedPhoneRow) => selectedPhoneRow.id === row.id)
+                );
+                setPhoneRows(remainingRows);
+                setSelectedPhoneRows([]);
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
         });
-      };
 
+        
+    };
 
+    
     const enable = (e) => {
-        e.preventDefault();
-
-    }
+        axios.post('http://localhost:8080/api/userProfile/enable-phone',{
+            _id: selectedPhoneRows[0].phone_id
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });    }
 
     const disable = (e) => {
-        e.preventDefault();
-
-    }
-
-    const deleteRow = (e) => {
-        e.preventDefault();
-
+        axios.post('http://localhost:8080/api/userProfile/disable-phone',{
+            _id: selectedPhoneRows[0].phone_id
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
     }
 
     const show = (e) => {
         e.preventDefault();
-
+        axios.post('http://localhost:8080/api/userProfile/show-comment',{
+            _id: selectedCommentRows[0].phone_id,
+            index: selectedCommentRows[0].amount,
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
     }
 
     const hide = (e) => {
         e.preventDefault();
-
+        axios.post('http://localhost:8080/api/userProfile/hide-comment',{
+            _id: selectedCommentRows[0].phone_id,
+            index: selectedCommentRows[0].amount,
+        }).then(function (response) {
+            console.log(response);
+            if (response.data.status == '0'){
+            }
+        }).catch(function (error) {
+            alert(error.response.data.message);
+        });
     }
 
-    const handleTabs = (e, value) => {
-        setValue(value);
-    }
-
-    function TabPanel(props){
-        const {children, value, index} = props;
-        return(<div>{
-            value===index && (
-                <h1>{children}</h1>
-            )
-        }</div>);
-    }
-
-    function createPhoneData(id, title, brand, stock, price){
-        return {id, title, brand, stock, price}
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
     };
 
-    function createCommentData(id, brand, comment){
-        return {id, brand, comment}
-    };
-
+    const signout = () => {
+        navigate('/');
+        Cookies.remove('id');
+    }
     
-
-    const commentColumns = [
-        { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'brand', headerName: 'Brand', width: 130 },
-        { field: 'comment', headerName: 'Comment', width: 300 },
-    ];
-
-    const commentRows =[
-        { id: 1, brand: 'testing', comment: 'testing'}
-    ];
 
     return(
         <div className="userProfile">
-            <Tabs value={value} onChange={handleTabs} textColor="secondary" indicatorColor="secondary">
-                <Tab label="User Profile" onClick={profile}/>
+            <Button sx={{display: 'flex', justifyContent: 'flex-start'}} variant="contained" onClick={signout}>Signout</Button>
+            <Tabs value={tabValue} onChange={handleTabChange} textColor="secondary" indicatorColor="secondary">
+                <Tab label="User Profile" />
                 <Tab label="Change Password" />
-                <Tab label="Listings" />
-                <Tab label="Comments" />
+                <Tab label="Listings" onClick={listing} />
+                <Tab label="Comments" onClick={comment}/>
             </Tabs>
-            <TabPanel value={value} index={0}>
-                <TextField sx={{ p: 1 }} id="email" label="email" value={email} onChange={(e) => setEmail(e.target.value)} InputProps={{readOnly: editStatus,}} variant="standard"  />
-                <TextField sx={{ p: 1 }} id="firstname" label="firstname"  InputProps={{readOnly: editStatus,}} variant="standard" value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
-                <TextField sx={{ p: 1 }} id="lastname" label="lastname"  InputProps={{readOnly: editStatus,}} variant="standard"  value={lastname} onChange={(e) => setLastname(e.target.value)}/>
-                <Button variant="contained" onClick={edit}>Edit</Button>
-                <Button variant="contained" onClick={editSubmit}>Submit</Button>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <TextField sx={{ p: 1 }} id="password" label="password" value={password} onChange={(e) => setPassword(e.target.value)} variant="standard"/>
-                <TextField sx={{ p: 1 }} id="newPassword" label="new password" value={newPassword} onChange={(e) => setnewPassword(e.target.value)} variant="standard"/>
-                <Button variant="contained" onClick={changePasswordSubmit}>Submit</Button>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <TextField sx={{ p: 1 }} id="title" label="title" variant="standard" type="title" value={title} onChange={(e) => setTitle(e.target.value)}/> 
-                <TextField sx={{ p: 1 }} id="brand" label="brand" variant="standard" type="brand" value={brand} onChange={(e) => setBrand(e.target.value)}/> 
-                <TextField sx={{ p: 1 }} id="stock" label="stock" variant="standard" type="stock" value={stock} onChange={(e) => setStock(e.target.value)}/> 
-                <TextField sx={{ p: 1 }} id="price" label="price" variant="standard" type="price" value={price} onChange={(e) => setPrice(e.target.value)}/> 
-                <Button variant="contained" onClick={handleAddRow}>add</Button>
 
-                <div style={{ height: 400, width: '50%', margin: 'auto'}}>
-                    <DataGrid rows={phoneRows} columns={phoneColumns} initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 },},}} pageSizeOptions={[5, 10]} checkboxSelection checked={checked} onChange={(e) => setChecked(e.target.value)}/>
-                    <Button variant="contained" onClick={enable}>Disable</Button>
-                    <Button variant="contained" onClick={disable}>Enable</Button>
-                    <Button variant="contained" onClick={handleDeleteRow}>Delete</Button>
+            {tabValue === 0 && (
+                <div>
+                    <TextField sx={{ p: 1 }} id="email" label="email" value={email} onChange={(e) => setEmail(e.target.value)} InputProps={{readOnly: editStatus,}} variant="standard"  />
+                    <TextField sx={{ p: 1 }} id="firstname" label="firstname"  InputProps={{readOnly: editStatus,}} variant="standard" value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
+                    <TextField sx={{ p: 1 }} id="lastname" label="lastname"  InputProps={{readOnly: editStatus,}} variant="standard"  value={lastname} onChange={(e) => setLastname(e.target.value)}/>
+                    <Button variant="contained" onClick={edit}>Edit</Button>
+                    <Button variant="contained" onClick={editSubmit}>Submit</Button>
                 </div>
-            </TabPanel>
-            <TabPanel value={value} index={3}>
+            )}
+
+            {tabValue === 1 && (
+                <div>
+                    <TextField sx={{ p: 1 }} type="password" id="password" label="password" value={password} onChange={(e) => setPassword(e.target.value)} variant="standard"/>
+                    <TextField sx={{ p: 1 }} type="password" id="newPassword" label="new password" value={newPassword} onChange={(e) => setnewPassword(e.target.value)} variant="standard"/>
+                    <Button variant="contained" onClick={changePasswordSubmit}>Submit</Button>
+                </div>
+            )}
+
+            {tabValue === 2 && (
+                <div>
+                    <TextField sx={{ p: 1 }} id="title" label="title" variant="standard" type="title" value={title} onChange={(e) => setTitle(e.target.value)}/> 
+                    <TextField sx={{ p: 1 }} id="brand" label="brand" variant="standard" type="brand" value={brand} onChange={(e) => setBrand(e.target.value)}/> 
+                    <TextField sx={{ p: 1 }} id="stock" label="stock" variant="standard" type="stock" value={stock} onChange={(e) => setStock(e.target.value)}/> 
+                    <TextField sx={{ p: 1 }} id="price" label="price" variant="standard" type="price" value={price} onChange={(e) => setPrice(e.target.value)}/> 
+                    <Button variant="contained" onClick={handleAddRow}>add</Button>
+
+                    <div style={{ height: 400, width: '50%', margin: 'auto'}}>
+                        
+                        <DataGrid rows={phoneRows} columns={phoneColumns} 
+                            onRowSelectionModelChange={(ids) => {
+                                const selectedPhoneIDs = new Set(ids);
+                                const selectedPhoneRows = phoneRows.filter((row) =>
+                                    selectedPhoneIDs.has(row.id),
+                                );
+                                setSelectedPhoneRows(selectedPhoneRows);
+                            }} 
+                            
+                            />   
+                        <Button variant="contained" onClick={disable}>Disable</Button>
+                        <Button variant="contained" onClick={enable}>Enable</Button>
+                        <Button variant="contained" onClick={handleDeleteRow}>Delete</Button>
+
+                    </div>
+                </div>            
+            )}
+            {tabValue === 3 && (
                 <div style={{ height: 400, width: '80%', margin: 'auto'}}>
-                    <DataGrid rows={commentRows} columns={commentColumns} initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 },},}} pageSizeOptions={[5, 10]} checkboxSelection/>
+                    <DataGrid rows={commentRows} columns={commentColumns} initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 },},}} pageSizeOptions={[5, 10]} onRowSelectionModelChange={(ids) => {
+                            const selectedCommentIDs = new Set(ids);
+                            const selectedCommentRows = commentRows.filter((row) =>
+                                selectedCommentIDs.has(row.id),
+                            );
+                            setSelectedCommentRows(selectedCommentRows);
+                            console.log(selectedCommentRows);
+                        }} />
                     <Button variant="contained" onClick={show}>Show</Button>
                     <Button variant="contained" onClick={hide}>Hide</Button>
                 </div>
-            </TabPanel>
+            )}
         </div>
     );
 };

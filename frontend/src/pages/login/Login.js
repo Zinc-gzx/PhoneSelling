@@ -7,6 +7,8 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Cookies from 'js-cookie';
+import Alert from '@mui/material/Alert';
+
 
 export const Login = () => {
     const [username, setUsername] = useState('');
@@ -21,6 +23,14 @@ export const Login = () => {
             console.log(response);
             if (response.data.status == "0"){
                 Cookies.set('id', response.data.id);
+                // return(               
+                //     <Alert severity="success">This is a success message!</Alert>
+                // );
+                navigate('/');
+            }else if (response.data.status == "1"){
+                alert('incorrect email or password');
+            }else if (response.data.status == "3"){
+                alert('already sign in, please sign out');
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -34,6 +44,7 @@ export const Login = () => {
                 <TextField sx={{ p: 1 }} id="outlined-basic" label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
                 <Button variant="contained" onClick={signIn}>Login</Button>
                 <Button variant="contained" onClick={() => {navigate("/setup")}}>Setup</Button>
+                <Button variant="contained" onClick={() => {navigate("/")}}>Cancel</Button>
                 <Link sx={{ p: 1 }} href="/reset_email" underline="hover">{'Forgot your password?'}</Link>
             </Box>
         </div>

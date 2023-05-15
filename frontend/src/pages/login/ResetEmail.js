@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import { useNavigate } from "react-router-dom";
 
+
 export const ResetEmail = () => {
     const [email, setEmail] = useState('');
     const navigate = useNavigate();
@@ -15,6 +16,11 @@ export const ResetEmail = () => {
             email: email
         }).then(function (response) {
             console.log(response);
+            if (response.data.status == "0"){
+                alert("Please verify your email to reset the password");
+            }else if (response.data.status == "2"){
+                alert("Missing Email");
+            }
         }).catch(function (error) {
             alert(error.response.data.message);
         });

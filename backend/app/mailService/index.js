@@ -15,7 +15,7 @@ module.exports = {
             subject: "[Old Phone Deals] Verify and Activate Your Account",
             html: `<h1>Old Phone Deals</h1>
                     <p>Please use the following link to verify and activate your account.</p>
-                    <a href="http://localhost:3000/email_verify?token=${token}"><p>Verify</p></a>`
+                    <a>http://localhost:3000/email_verify?token=${token}</a>`
           };
         transporter.sendMail(message);
     },
@@ -27,7 +27,7 @@ module.exports = {
             subject: "[Old Phone Deals] Password Reset",
             html: `<h1>Old Phone Deals</h1>
                     <p>Please use the following link to reset your password.</p>
-                    <a href="http://localhost:3000/reset_password?token=${token}"><p>Reset Password</p></a>`
+                    <a>http://localhost:3000/reset_password?token=${token}</a>`
           };
         transporter.sendMail(message);
     },

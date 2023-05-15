@@ -140,6 +140,7 @@ module.exports = {
                         token = buffer.toString('base64');
                         token = encodeURIComponent(token);
                         db.User.registerPasswordResetToken(instance, token, (err, instance) => {
+                            
                             if (instance) {
                                 mailService.sendPasswordResetVerification(token, email);
                             }
@@ -244,22 +245,20 @@ module.exports = {
 
     checkPassword: (req, res) => {
         let id = req.query.id;
-        let password = req.query.password
+        let password = req.query.password;
         db.User.getById(id, (err, instance) => {
             if (instance) {
-                bcrypt.compare(password, instance.password).then(function(result) {
-                    if (result){
-                        return res.send({
-                            status: 0,
-                            message: 'ok',
-                        });
-                    }else{
-                        return res.send({
-                            status: 1,
-                            message: 'wrong password',
-                        });
-                    }
-                });
+                if (bcrypt.compareSync(password, instance.password)) {
+                    return res.send({
+                        status: 0,
+                        message: 'ok',
+                    });
+                }else{
+                    return res.send({
+                        status: 1,
+                        message: 'wrong password',
+                    });
+                }
             
             }else {
                 console.log(err);
