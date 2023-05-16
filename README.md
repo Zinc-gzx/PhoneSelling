@@ -54,5 +54,13 @@ We use axios to handle our data transmission.\
 We use js-cookies to set cookies.\
 We use js-password-checklist to validate password.\
 
+## About Contribution
+
+Due to the different system environment, github for this project is not really easy to use, especially for the new beginner. Some conflics always 
+happenned from node_modules, bcrypto, etc. So that, some members perfer offline data transimission collobration during this assignment. Overall,
+thanks for everyone in this team, we handle problems together and contribute everyone's work fairly. 
+
+
+
 
 
