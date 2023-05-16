@@ -8,7 +8,6 @@ import { useRecoilState } from "recoil";
 
 export const Checkout = () => {
   const [phoneData, setPhoneData] = useRecoilState(cartArr);
-  console.log(phoneData)
   const location = useLocation();
   const data = location.state;
   const navigate = useNavigate();
@@ -53,7 +52,7 @@ export const Checkout = () => {
     }
 
     if (newQuantity > maxStock) return;
-    console.log('input', newQuantity)
+    // console.log('input', newQuantity)
     const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
 
     updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
@@ -69,7 +68,6 @@ export const Checkout = () => {
       // stocks:stock,
       phone: phoneData,
     }).then(function (response) {
-      console.log(1);
       if (response.data.code === 200) {
         alert('Your payment is successful!');
       }
@@ -78,7 +76,6 @@ export const Checkout = () => {
     }).catch(function (error) {
       alert(error.response.data.message);
     });
-    console.log('sucess submit');
   };
 
   
@@ -107,7 +104,6 @@ export const Checkout = () => {
         {phoneData.map((phone, index) => (
           <Grid container item xs={12} key={index} direction="row">
             <Grid item xs>
-              {console.log(phone.title)}
               <Typography variant="body1">{phone.title}</Typography>
             </Grid>
             <Grid item xs>

@@ -10,15 +10,16 @@ export const catArrWithBasePrice = selector({
     get: ({ get }) => {
       return get(cartArr);
     },
-    set: ({ set }, newValue) => {
-        console.log('new val',newValue);
-      const newData = newValue.filter((item)=>item.quantity).map((item) => {
-       
-        return {
-          ...item,
-          basePrice:item.basePrice || item.price,
-        };
-      });
-      set(cartArr, newData);
-    },
+    set: ({set}, newValue)=>{
+      const newData = newValue.filter(item=>item.quantity).map((item)=>{
+          const basePrice = item.basePrice || item.price
+          const totalPrice = basePrice * item.quantity
+          return {
+              ...item,
+              price: totalPrice,
+              basePrice: basePrice,
+          }
+      })
+      set(cartArr, newData)
+  }
   });

@@ -7,6 +7,8 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
+import PasswordCheckList from "react-password-checklist";
+
 
 export const UserProfile = () => {
     const [email, setEmail] = useState('');
@@ -14,6 +16,8 @@ export const UserProfile = () => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [newPassword, setnewPassword] = useState('');
+    const [passValid, setPassValid] = useState(false);
+
 
     const [title, setTitle] = useState('');
     const [brand, setBrand] = useState('');
@@ -27,11 +31,10 @@ export const UserProfile = () => {
     const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
 
-
+    ///todo
     let id = Cookies.get('id');
-    useEffect = () => {
-        if (email === "") {
-            axios.get('http://localhost:8080/api/auth/user-profile',{
+    const profile = () => {
+        axios.get('http://localhost:8080/api/auth/user-profile',{
                 params:{
                     id: id
                 }
@@ -42,13 +45,10 @@ export const UserProfile = () => {
                     setLastname(response.data.lastname);
                 }
             }).catch(function (error) {
-                // alert(error.response.data.message);
+                alert(error.response.data.message);
             });
-        }
-        
     }
-    //get profile
-
+    
     const edit = (e) => {
         setEditStatus(false);
     }
@@ -62,9 +62,10 @@ export const UserProfile = () => {
             firstname: firstname,
             lastname, lastname
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == "0"){
-                //refresh
+                alert('Your have successfully changed your profile');
+            }else if (response.data.status == "1"){
+                alert('One of the field is empty');
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -72,27 +73,39 @@ export const UserProfile = () => {
     }
     //change password
     const changePasswordSubmit = () => {
-        axios.get('http://localhost:8080/api/auth/check-password', {
-            params:{
-                password: password,
-                id: id
-            }
-        }).then(function (response){
-            console.log(response);
-            if (response.data.status == '0'){
-                axios.post('http://localhost:8080/api/auth/reset-password-user-profile', {
-                    id: id,
-                    password: newPassword
-                }).then(function (response) {
-                    console.log(response);
-                }).catch(function (error) {
-                    alert(error.response.data.message);
-                });
-            }
-        }).catch(function (error) {
-            alert(error.response.data.message);
-        });
-      
+        if (passValid){
+            axios.get('http://localhost:8080/api/auth/check-password', {
+                params:{
+                    password: password,
+                    id: id
+                }
+            }).then(function (response){
+                if (response.data.status == '0'){
+                    axios.post('http://localhost:8080/api/auth/reset-password-user-profile', {
+                        id: id,
+                        password: newPassword
+                    }).then(function (response) {
+                        if (response.data.status == '0'){
+                            alert("You have successfully reset your password, an email has sent to your mail box");
+                        }
+                    }).catch(function (error) {
+                        alert(error.response.data.message);
+                    });
+                    // setPassValid(false);
+
+                }else if (response.data.status == '1'){
+                    alert('Wrong password');
+                }else if (response.data.status == '2'){
+                    alert('Missing password');
+                }
+            }).catch(function (error) {
+                alert(error.response.data.message);
+            });
+
+        }else{
+            alert("Please ensure your password has 8 character length, one uppercase and one symbol");
+
+        }
     }
 
     const phoneColumns = [
@@ -114,12 +127,12 @@ export const UserProfile = () => {
     let responsePhoneList = [];
 
     const listing = (e) => {
+
         axios.get('http://localhost:8080/api/userProfile/listing',{
             params:{
                 id: id
             }
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
                 response.data.phones.map((phone, index) => {
                     responsePhoneList.push({
@@ -132,6 +145,8 @@ export const UserProfile = () => {
                     });
                 });
                 setPhoneRows(responsePhoneList);
+            }else{
+                alert('Internal Error');
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -170,6 +185,8 @@ export const UserProfile = () => {
                     
                 });
                 setCommentRows(responseCommentList);
+            }else{
+                alert('Internal Error');
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -184,12 +201,17 @@ export const UserProfile = () => {
             stock: stock,
             price: price
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == "0"){
                 let newRow = {
                     id: phoneRows.length+1, title: title, brand: brand, stock: stock, price: price, phone_id: response.data.phones._id
                 }
                 setPhoneRows((prevRows) => [...prevRows, newRow]);
+            }else if (response.data.status == "1"){
+                alert('Missing field');
+            }else if (response.data.status == "2"){
+                alert('Please enter a number for stock and price');
+            }else if (response.data.status == "3"){
+                alert('Please enter a valid number for stock and price')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -203,14 +225,14 @@ export const UserProfile = () => {
         axios.post('http://localhost:8080/api/userProfile/delete-phone',{
             _id: selectedPhoneRows[0].phone_id
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
-            
                 const remainingRows = phoneRows.filter(
                     (row) => !selectedPhoneRows.find((selectedPhoneRow) => selectedPhoneRow.id === row.id)
                 );
                 setPhoneRows(remainingRows);
                 setSelectedPhoneRows([]);
+            }else{
+                alert('Internal Error')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -224,8 +246,10 @@ export const UserProfile = () => {
         axios.post('http://localhost:8080/api/userProfile/enable-phone',{
             _id: selectedPhoneRows[0].phone_id
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
+                alert('You have successfully enable the phone');
+            }else{
+                alert('Internal Error')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -235,8 +259,10 @@ export const UserProfile = () => {
         axios.post('http://localhost:8080/api/userProfile/disable-phone',{
             _id: selectedPhoneRows[0].phone_id
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
+                alert('You have successfully disable the phone');
+            }else{
+                alert('Internal Error')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -245,12 +271,16 @@ export const UserProfile = () => {
 
     const show = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8080/api/userProfile/show-comment',{
-            _id: selectedCommentRows[0].phone_id,
-            index: selectedCommentRows[0].amount,
+        axios.post('http://localhost:8080/api/home/hide',{
+            reviewers: selectedCommentRows[0].reviewer,
+            phoneID: selectedCommentRows[0].phone_id,
+            commentHide: false,
+
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
+                alert('You have successfully show the comment')
+            }else{
+                alert('Internal Error')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -259,12 +289,16 @@ export const UserProfile = () => {
 
     const hide = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8080/api/userProfile/hide-comment',{
+        axios.post('http://localhost:8080/api/home/hide',{
             _id: selectedCommentRows[0].phone_id,
-            index: selectedCommentRows[0].amount,
+            reviewers: selectedCommentRows[0].reviewer,
+            phoneID: selectedCommentRows[0].phone_id,
+            commentHide: true,
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == '0'){
+                alert('You have successfully hide the comment');
+            }else{
+                alert('Internal Error')
             }
         }).catch(function (error) {
             alert(error.response.data.message);
@@ -276,24 +310,28 @@ export const UserProfile = () => {
     };
 
     const signout = () => {
-        navigate('/');
-        Cookies.remove('id');
+        let result = window.confirm('Do you want to sign out?');
+        if (result) {
+            navigate('/');
+            Cookies.remove('id');
+        }
     }
     
 
     return(
         <div className="userProfile">
             <Button sx={{display: 'flex', justifyContent: 'flex-start'}} variant="contained" onClick={signout}>Signout</Button>
+            <Button sx={{display: 'flex', justifyContent: 'flex-start'}} variant="contained" onClick={() => navigate('/')}>Back</Button>
             <Tabs value={tabValue} onChange={handleTabChange} textColor="secondary" indicatorColor="secondary">
-                <Tab label="User Profile" />
                 <Tab label="Change Password" />
+                <Tab label="User Profile" onClick={profile}/>
                 <Tab label="Listings" onClick={listing} />
                 <Tab label="Comments" onClick={comment}/>
             </Tabs>
 
-            {tabValue === 0 && (
+            {tabValue === 1 && (
                 <div>
-                    <TextField sx={{ p: 1 }} id="email" label="email" value={email} onChange={(e) => setEmail(e.target.value)} InputProps={{readOnly: editStatus,}} variant="standard"  />
+                    <TextField sx={{ p: 1 }} id="email" type='email' label="email" value={email} onChange={(e) => setEmail(e.target.value)} InputProps={{readOnly: editStatus,}} variant="standard"  />
                     <TextField sx={{ p: 1 }} id="firstname" label="firstname"  InputProps={{readOnly: editStatus,}} variant="standard" value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
                     <TextField sx={{ p: 1 }} id="lastname" label="lastname"  InputProps={{readOnly: editStatus,}} variant="standard"  value={lastname} onChange={(e) => setLastname(e.target.value)}/>
                     <Button variant="contained" onClick={edit}>Edit</Button>
@@ -301,10 +339,11 @@ export const UserProfile = () => {
                 </div>
             )}
 
-            {tabValue === 1 && (
+            {tabValue === 0 && (
                 <div>
                     <TextField sx={{ p: 1 }} type="password" id="password" label="password" value={password} onChange={(e) => setPassword(e.target.value)} variant="standard"/>
                     <TextField sx={{ p: 1 }} type="password" id="newPassword" label="new password" value={newPassword} onChange={(e) => setnewPassword(e.target.value)} variant="standard"/>
+                    <PasswordCheckList rules={["minLength", 'specialChar', "capital"]} minLength={8} value={newPassword} onChange={(isValid) => {setPassValid(isValid)}}/>
                     <Button variant="contained" onClick={changePasswordSubmit}>Submit</Button>
                 </div>
             )}
@@ -344,7 +383,6 @@ export const UserProfile = () => {
                                 selectedCommentIDs.has(row.id),
                             );
                             setSelectedCommentRows(selectedCommentRows);
-                            console.log(selectedCommentRows);
                         }} />
                     <Button variant="contained" onClick={show}>Show</Button>
                     <Button variant="contained" onClick={hide}>Hide</Button>

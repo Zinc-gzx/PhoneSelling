@@ -7,33 +7,20 @@ import Rating from "@mui/material/Rating";
 import Button from '@mui/material/Button';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { Link } from "react-router-dom";
+import { ReviewHide } from "./reviewHide";
   
 
 export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
     const [openDialogId, setOpenDialogId] = useState(null);
     const [reviewList, setReviewList] = useState([]);
-    const [isExpanded, setIsExpanded] = useState({});
-    const [numDisplayed, setNumDisplayed] = useState({});
-    const [quantity, setQuantity] = useState(0);
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState(0);
     const [quantities, setQuantities] = useState({});
-    const [hiddenComment, setHiddenComment] = useState(false);
-
-    const handleHidden = (id) => {
-        const temList = phoneList.filter(i => i._id === id);
-        setHiddenComment(!hiddenComment);
-    };
-
-    const commentStyle = {
-        color: hiddenComment ? 'grey' : 'black'
-    };
 
     const cookieChecker = Cookies.get('id');
     const isSignedIn = cookieChecker !== undefined && cookieChecker !== '{}';
 
-    //console.log("Cookie in ItemState:" , Cookies.get('id'))
-  
     const handleClickOpen = (id) => {
      setOpenDialogId(id);
      const temList = phoneList.filter(i => i._id === id);
@@ -44,62 +31,55 @@ export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
      setOpenDialogId(null);
     };
    
-    //const [isExpanded, setIsExpanded] = useState(false);
-    // const handleShowMore = () => {
-    //  setIsExpanded(true);
-    // };
 
-    const handleShowMore = (id) => {
-        setIsExpanded({
-          ...isExpanded,
-          [id]: true,
-        });
-      };
-   
-    //const [numDisplayed, setNumDisplayed] = useState(3);
-   
-    // const handleShowMoreReviews = () => {
-    //  setNumDisplayed(numDisplayed + 3);
-    //  };
-
-    const handleShowMoreReviews = (id) => {
-        setNumDisplayed({
-          ...numDisplayed,
-          [id]: numDisplayed[id] ? numDisplayed[id] + 3 : 3,
-        });
-      };
+      const addToCart = (id) => {
+        const temList = phoneList.filter(i => i._id === id);
+        const inputNumStr = prompt("Enter quantity: ");
     
-      const addToCart = (id) => {
-            const temList = phoneList.filter(i => i._id === id);
-            const inputQuantity = parseInt(prompt("Enter quantity: "), 10);
-            if (!isNaN(inputQuantity) && inputQuantity > 0 && temList[0].stock >= inputQuantity) {
-                const existingItemIndex = cartArray.findIndex(item => item._id === id);
-        
-                if (existingItemIndex >= 0) {
-                    // Update the quantity of the existing item
-                    const newCartArray = cartArray.map((item, index) => {
-                        if (index !== existingItemIndex) {
-                            return item;
-                        }
-                        return {
-                            ...item,
-                            quantity: item.quantity + inputQuantity,
-                        };
-                    });
-                    setCartArray(newCartArray);
-                } else {
-                    // Add the item to the cart as a new item
-                    temList[0].quantity = inputQuantity;
-                    setQuantities({
-                        ...quantities,
-                        [id]: inputQuantity,  // Update quantity for this item
-                    });
-                    setCartArray([...cartArray, ...temList]);
-                }
-            } else {
-                alert("No enough stock ! ");
-            }
-        };
+        if (inputNumStr === null) {
+            return;  // User clicked Cancel, so do nothing
+        }
+    
+        // Check if the string is a valid number (integer or decimal)
+        if (!/^\d+(\.\d+)?$/.test(inputNumStr)) {
+            alert("You should input a valid number for quantity");
+            return;
+        }
+    
+        const inputQuantity = parseFloat(inputNumStr);
+    
+        if (inputQuantity <= 0) {
+            alert("You should input a positive number");
+        } else if (!Number.isInteger(inputQuantity)) {
+            alert("You should input an integer number");
+        } else if (temList[0].stock < inputQuantity) {
+            alert("No enough stock!");
+        } else {
+            const existingItemIndex = cartArray.findIndex(item => item._id === id);
+    
+            if (existingItemIndex >= 0) {
+                // Update the quantity of the existing item
+                const newCartArray = cartArray.map((item, index) => {
+                    if (index !== existingItemIndex) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        quantity: item.quantity + inputQuantity,
+                    };
+                });
+                setCartArray(newCartArray);
+            } else {
+                // Add the item to the cart as a new item
+                temList[0].quantity = inputQuantity;
+                setQuantities({
+                    ...quantities,
+                    [id]: inputQuantity,  // Update quantity for this item
+                });
+                setCartArray([...cartArray, ...temList]);
+            }
+        }
+    };
 
     const submitComment = (e, id) => {
         e.preventDefault();
@@ -110,7 +90,6 @@ export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
             ratings:rating,
             phoneID: id
         }).then(function (response) {
-            console.log(response);
         }).catch(function (error) {
             alert(error.response.data.message);
         });
@@ -120,19 +99,6 @@ export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
     };
 
 
-    // const test = () => {
-    //     reviewList.map((item, index) => {
-    //         //console.log("item", item)
-    //         item.reviews.map(review => {
-    //             if (Object.keys(review).length < 4) {
-    //                 console.log("false")
-    //               }
-    //             //console.log("review: ", review)
-    //         })
-    //     })
-    // }
-    
-    //test()
      return (
      <div>
      <div className="image-container" style={{ display: 'flex' }}>
@@ -143,33 +109,36 @@ export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
          <DialogTitle>Detail of Phone</DialogTitle>
          <DialogContent>
           <div>
-          {isSignedIn && (
-            <div>
-            <div>Current quantity: {quantities[i._id] || 0}</div>
-            <Button variant="contained" onClick={() => addToCart(i._id)}>
-                Add to Cart
-            </Button>
-            </div>
-            )}
-
-            {/* <Button variant="contained" onClick={() => addToCart(i._id)}>
-                Add to Cart
-            </Button> */}
+          {isSignedIn ? 
+                <>
+                
+                <div>
+                <div>Current quantity: {quantities[i._id] || 0}</div>
+                <Button variant="contained" onClick={() => addToCart(i._id)}>
+                    Add to Cart
+                </Button>
+                </div>
+                </>
+                : 
+                <>
+                    <Link to={"/login"}>
+                    <Button variant="contained">
+                    Add to Cart
+                    </Button>
+                    </Link>
+                </>
+            }
             </div>
           <p>Title: {i.title}</p >
           <p>Brand: {i.brand}</p >
           < img alt="phone" src={`/${i.image}`} style={{ height: "100px", width: "100px" }}/>
           <p>Stock: {i.stock}</p >
-          {/* <p>Seller: {i.seller.firstname} {i.seller.lastname}</p > */}
           <p>Seller: {i.seller ? i.seller.firstname : 'Unknown'} {i.seller ? i.seller.lastname : ''}</p >
 
           <p>Price: {i.price}</p >
          <div>
          
-
-          <div>
-          <Button variant="contained" onClick={() => handleShowMoreReviews(i._id)}>Show More Reviews</Button>
-          </div>
+            <ReviewHide reviewList={reviewList}/>
           <div>
 
 
@@ -212,17 +181,18 @@ export const ItemState = ({cartArray, setCartArray, phoneList, BestorSold}) =>{
             <br />
             {BestorSold === 0 ? 
                 <>
-                    <span>{i.title}</span>
-                    <span style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
+                    <div>{i.title}</div>
+                    <div style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
                         ${i.price}
-                    </span> 
+                    </div> 
                 </>
                 : 
                 <>
-                    <span>{i.title}</span>
-                    <span style={{ fontSize: "20px", color: "red", padding: "0 20px" }}>
-                        {i.average}
-                    </span>
+                
+                    <div>{i.title}</div>
+                    <div style={{ fontSize: "20px", color: "gold", padding: "0 20px" }}>
+                       Average Rating: {i.average} 
+                    </div>
                 </>
             }    
             <br />

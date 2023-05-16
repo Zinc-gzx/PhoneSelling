@@ -15,7 +15,6 @@ export const ResetEmail = () => {
         axios.post('http://localhost:8080/api/auth/reset-password-request', {
             email: email
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == "0"){
                 alert("Please verify your email to reset the password");
             }else if (response.data.status == "2"){

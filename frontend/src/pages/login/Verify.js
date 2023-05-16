@@ -16,7 +16,6 @@ export const Verify = () => {
                 token: token
             }
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == "0"){
                 setStatus(response.data.status);
             }

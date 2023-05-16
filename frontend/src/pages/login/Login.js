@@ -20,7 +20,6 @@ export const Login = () => {
             email: username,
             password: password
         }).then(function (response) {
-            console.log(response);
             if (response.data.status == "0"){
                 Cookies.set('id', response.data.id);
                 // return(               

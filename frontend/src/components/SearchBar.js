@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-//import {Navbar, Container, Row, Col, FormControl, Button, InputGroup } from 'react-bootstrap';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import axios from 'axios';
 import { ItemState } from "./ItemState";
 
@@ -41,7 +38,7 @@ const SearchBar = ({ cartArray, setCartArray }) => {
     setSelectedBrand(event.target.value);
   };
 
-  const handleChange = (event) => {
+  const handleSliderChange = (event) => {
     setMaxPrice(event.target.value);
   };
   const handleSearch = () => {
@@ -51,17 +48,18 @@ const SearchBar = ({ cartArray, setCartArray }) => {
       } else {
         setSearch(false);
       }
-      
-    
 
   };
 
-  const handleSearchOut = () => {
-    setSearch(false);
-  };
 
-
-  const filteredData = data.filter(i => i.title.toLowerCase().includes(searchTerm.toLowerCase())).filter(i => i.price <= maxPrice).filter(i => !selectedBrand || i.brand === selectedBrand);
+  const filteredData = data.filter(i => 
+    i.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    i.price <= maxPrice &&
+    (!selectedBrand || i.brand === selectedBrand) &&
+    i.stock > 0 &&
+    i.disabled === undefined
+  );
+  
 
   return search ? (
     <Grid container direction="column" justifyContent="flex-start" alignItems="flex-start">
@@ -93,7 +91,7 @@ const SearchBar = ({ cartArray, setCartArray }) => {
           min="0"
           max="500"
           value={maxPrice}
-          onChange={handleChange}
+          onChange={handleSliderChange}
           style={{ width: '100%' }}
         />
         <p>Max price: {maxPrice}</p >

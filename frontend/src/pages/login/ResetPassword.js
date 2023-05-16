@@ -49,7 +49,7 @@ export const ResetPassword = () => {
                 <h1>Reset Password</h1>
                 <TextField sx={{p:1}} label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
                 <TextField sx={{p:1}} label="confirm password" variant="outlined" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/> 
-                <PasswordCheckList rules={["minLength", 'specialChar', "capital", "match"]} minLength={8} value={password} valueAgain={confirmPassword} onChange={(isValid) => {setPassValid(true)}}/>
+                <PasswordCheckList rules={["minLength", 'specialChar', "capital", "match"]} minLength={8} value={password} valueAgain={confirmPassword} onChange={(isValid) => {setPassValid(isValid)}}/>
                 <Button variant="contained" onClick={changePassword}>Confirm</Button>
                 <Button variant="contained" onClick={() => {navigate("/login")}}>Cancel</Button>
             </Box>

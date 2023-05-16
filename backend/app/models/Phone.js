@@ -28,35 +28,36 @@ const UserProfileSchema =  new Schema(
 			type: String,
 			default: "",
 		},
+
+		reviews: [],
 		
-		reviews: {
-			type: [
-				{
-					reviewer: {
-						type: String,
-						required: true
-					},
+		// reviews: {
+		// 	type: [
+		// 		{
+		// 			reviewer: {
+		// 				type: String,
+		// 				required: true
+		// 			},
 
-					rating: {
-						type: Number,
-						required: true
-					},
+		// 			rating: {
+		// 				type: Number,
+		// 				required: true
+		// 			},
 
-					comment: {
-						type: String,
-						required: true
-					},
+		// 			comment: {
+		// 				type: String,
+		// 				required: true
+		// 			},
 
-					hidden: {
-						type: String,
-						required: false
-					}
+		// 			hidden: {
+		// 				type: String,
+		// 				required: false
+		// 			}
 
-				}
-			],
-
-			required: false
-		},
+		// 		}
+		// 	],
+		// 	required: false
+		// },
 			
 	
 		disabled: {
@@ -89,7 +90,6 @@ UserProfileSchema.statics.deletePhone = async function (id, cb) {
 		_id: id
     }).exec((err, instance) => {
         if (instance) {
-			console.log(instance, id);
 			cb(null, instance);
 			return;
         }

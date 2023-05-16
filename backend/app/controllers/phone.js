@@ -36,22 +36,17 @@ const getPhoneUserData = async phoneList => {
 				{ _id: review.reviewer },
 				{ password: 0 }
 			);
-			//console.log("user:", user)
 			reviews.push({
 				...review,
 				reviewer: user,
 			});
-			//console.log("reviews:", reviews)
 		}
 		list2.push({
 			...phone,
 			reviews,
 		});
 
-		// for (const test of list2) {
-		// 	console.log("list2:", test.reviews)
-		// }
-		
+	
 	}
 
 	return list2;
@@ -86,6 +81,7 @@ class Controller {
 
 			const phoneListBest = await phoneModel.find({
 				disabled: null,
+				stock: { $gt: 0 },
 				reviews: { $exists: true },
 				$where: "this.reviews.length>=2",
 			});
@@ -96,30 +92,31 @@ class Controller {
 
 			for(let i = 0; i < listWithUser.length; i++) {
 				let phone = listWithUser[i];
-				
 				let totalRating = 0;
-			
+				
 				for(let j = 0; j < phone.reviews.length; j++) {
 					totalRating += phone.reviews[j].rating;
 				}
 			
 				let averageRating = totalRating / phone.reviews.length;
+
 				averageRating = Number(averageRating.toFixed(2)); // rounding to 2 decimal places
 			
 				let phoneWithAverage = Object.assign({}, phone); // copying the phone object
 				
 				phoneWithAverage.average = averageRating; // adding the average rating
-			
+				
 				list1.push(phoneWithAverage);
 			}
-
 
 			
 			const list2 = list1.sort((a, b) => {
 				return -(a.average - b.average);
 			});
+
 			
 			const listBest = list2.slice(0,5);
+
 			
 			res.json({
 				code: 200,
@@ -143,19 +140,15 @@ class Controller {
 
     async updateComment(req, res) {
 		try {
-            let comments = req.body.comments;
-            let ratings = req.body.ratings;
-            let reviewers = req.body.reviewers;
+            let comment = req.body.comments;
+            let rating = req.body.ratings;
+            let reviewer = req.body.reviewers;
             let phoneID = req.body.phoneID;
-            console.log("comments:" ,comments);
-            console.log("ratings:" ,ratings);
-            console.log("reviewers:" ,reviewers);
-            console.log("phoneID:" ,phoneID);
 
 
             let phone = await phoneModel.findByIdAndUpdate(
                 phoneID, 
-                { $push: { reviews: { reviewers, ratings, comments } } }, 
+                { $push: { reviews: { reviewer, rating, comment } } }, 
                 { new: true, useFindAndModify: false } 
             );
     
@@ -177,7 +170,57 @@ class Controller {
     }
 
 
-    async updateStock(req, res) {
+	async updateHide(req, res) {
+		try {
+            let reviewers_id = req.body.reviewers;
+            let phoneID = req.body.phoneID;
+			// if true set a hidden varible.
+			let commentHide = req.body.commentHide;
+           
+
+			let phone = await phoneModel.findById(phoneID);
+
+			if (!phone) {
+				// Handle the case where the phone is not found
+				return;
+			}
+           
+	
+			// Find the review
+			let review = phone.reviews.find(review => review.reviewer.toString() === reviewers_id);
+	
+			if (!review) {
+				// Handle the case where the review is not found
+				return;
+			}
+			
+			if (commentHide === true && !review.hasOwnProperty('hidden')) {
+				// If commentHide is true and the review doesn't have a hidden property, add it
+				review.hidden = '';
+			} else if (commentHide === false && review.hasOwnProperty('hidden')) {
+				// If commentHide is false and the review has a hidden property, remove it
+				delete review.hidden;
+			}
+
+			phone.markModified('reviews');
+
+	
+			// Save the phone document
+			await phone.save();
+
+            
+        } catch (err) {
+			console.error(err);
+			req.json({
+				code: 500,
+				msg: "error",
+				data: {},
+			});
+		}
+    }
+
+
+async updateStock(req, res) {
 	        try {
 	            // Get from frontend
 	            let phoneFromFrontEnd = req.body.phone;
@@ -191,7 +234,6 @@ class Controller {
 	            });
 	            
 	            let updatedPhones = await Promise.all(updatePromises);
-	            console.log("sucess");
 	            res.json({ code: 200, msg: "Success" });
 	    
 	        } catch (err) {

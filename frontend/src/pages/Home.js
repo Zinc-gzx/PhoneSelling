@@ -19,16 +19,9 @@ export const Home = () => {
     const [brand, setBrand] = useState({ list: [] });
     const [soldOut, setsSoldOut] = useState([]);
     const [best, setBest] = useState([]);
-    //const [cartArray, setCartArray] = useState([]);
+
     const [isSignedIn, setIsSignedIn] = useState(Cookies.get('id') !== undefined && Cookies.get('id') !== '{}');
-    //const [isSignedIn, setIsSignedIn] = useState(false);
-    //console.log("Cookie:" , Cookies.get('id'))
-    //console.log("Cookie Remove:", Cookies.remove('id'))
-    // const cookieChecker = Cookies.get('id');
-    // let isSignedIn = cookieChecker !== undefined && cookieChecker !== '{}';
-    // //setIsSignedIn(cookieStatus);
-    // console.log("isSignedIn:" , isSignedIn);
-    //console.log("Cookie Remove:", Cookies.remove('id'))
+    
     // Get response, all phone data,  from backend
     const [cartArray, setCartArray] = useRecoilState(catArrWithBasePrice);
     useEffect(() => {
@@ -36,10 +29,13 @@ export const Home = () => {
         }).then(function (response) {
             const temp = response;
             const temp2 = temp.data;
-            console.log(response)
+            //Get all data from backend
             setData(temp2.data.list);
+            //Get all brand from backend
             setBrand(temp2.data.brands);
+            // Get soldout list
             setsSoldOut(temp2.data.listSoldOut);
+            // Get best Seller list
             setBest(temp2.data.listBest);
 
         }).catch(function (error) {
@@ -53,19 +49,15 @@ export const Home = () => {
     };
 
     const handleSignOut = () => {
-        Cookies.remove('id');
-        setIsSignedIn(false);
-        console.log("Handle sign out:", isSignedIn);
-    }
+        let result = window.confirm('Do you want to sign out?')
+        if(result){
+            Cookies.remove('id');
+            setIsSignedIn(false);
+        }
+        else return;
+    }
 
-    // useEffect(() => {
-    //     localStorage.setItem('cart', JSON.stringify(cartArray));
-    // }, [cartArray]);
     
-
-    useEffect(() => {
-        console.log("Cart Array:", cartArray);
-    }, [cartArray]);
     if (isSignedIn) {
             return (
                 <Grid container spacing={2} justifyContent="space-between" alignItems="center">
@@ -111,13 +103,13 @@ export const Home = () => {
                         <h2>Sold Out Soon:</h2>
                     </Grid>
                     <Grid item xs={12}>
-                            <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={soldOut} />
+                            <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={soldOut} BestorSold = {0}/>
                     </Grid>
                     <Grid item xs={12} container justifyContent="flex-start" alignItems="flex-start" style={{marginLeft:'30px'}}>
                         <h2>Best Seller:</h2>
                     </Grid>
                     <Grid item xs={12}>
-                        <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={best} />
+                        <ItemState cartArray={cartArray} setCartArray={setCartArray} phoneList={best} BestorSold = {1}/>
                     </Grid>
                 </Grid>
             );

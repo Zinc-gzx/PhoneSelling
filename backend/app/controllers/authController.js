@@ -24,7 +24,6 @@ module.exports = {
             db.User.authenticate(email, password, (err, instance) => {
                 if (instance) {
                     req.session.userId = instance._id;
-                    // console.log(req.session.userId);
                     return res.send({
                         status: 0,
                         message: 'ok',
@@ -217,6 +216,12 @@ module.exports = {
         let firstname = req.body.firstname;
         let lastname = req.body.lastname;
         let id = req.body.id;
+        if (email == '' || firstname == '' || lastname == '') {
+            return res.send({
+                status: 1,
+                message: 'Field empty'
+            })
+        }
         db.User.getById(id, (err, instance) => {
             if (instance) {
                 db.User.editProfile(instance, email, firstname, lastname, (err, instance) => {
@@ -236,8 +241,8 @@ module.exports = {
             }else{
                 console.log(err);
                 return res.send({
-                    status: -1,
-                    message: 'internal error',
+                    status: 2,
+                    message: 'Setup issue, user not found',
                 });
             }
         });
@@ -246,6 +251,12 @@ module.exports = {
     checkPassword: (req, res) => {
         let id = req.query.id;
         let password = req.query.password;
+        if (password == ''){
+            return res.send({
+                status: 2,
+                message: 'Missing password'
+            })
+        }
         db.User.getById(id, (err, instance) => {
             if (instance) {
                 if (bcrypt.compareSync(password, instance.password)) {

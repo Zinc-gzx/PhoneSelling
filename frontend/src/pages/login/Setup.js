@@ -22,10 +22,8 @@ export const Setup = () => {
                 firstname: firstname,
                 lastname: lastname
             }).then(function (response) {
-                console.log(response);
                 if (response.data.status == "0"){
                     alert('You have successfully setup please verify your email');
-
                 }else if (response.data.status == "2"){
                     alert('Missing email, password, firstname, or lastname');
                 }
@@ -44,7 +42,7 @@ export const Setup = () => {
                 <h1>Setup</h1>
                 <TextField sx={{p:1}} label="email" variant="outlined" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/> 
                 <TextField sx={{p:1}} label="password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/> 
-                <PasswordCheckList rules={["minLength", 'specialChar', "capital"]} minLength={8} value={password} onChange={(isValid) => {setPassValid(true)}}/>
+                <PasswordCheckList rules={["minLength", 'specialChar', "capital"]} minLength={8} value={password} onChange={(isValid) => {setPassValid(isValid)}}/>
                 <TextField sx={{p:1}} label="firstname" variant="outlined" type="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)}/> 
                 <TextField sx={{p:1}} label="lastname" variant="outlined"type="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)}/> 
                 <Button variant="contained" onClick={setUp}>Submit</Button>
