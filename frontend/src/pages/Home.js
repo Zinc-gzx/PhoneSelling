@@ -19,7 +19,7 @@ export const Home = () => {
     const [soldOut, setsSoldOut] = useState([]);
     const [best, setBest] = useState([]);
     // const [cartArray, setCartArray] = useState([]);
-    const [cartArray, setCartArray] = useRecoilState(catArrWithBasePrice);
+    const [cartArray, setCartArray] = useRecoilState(catArrWithBasePrice);// state management code 
 
     // Get response, all phone data,  from backend
     useEffect(() => {

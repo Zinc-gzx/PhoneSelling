@@ -1,20 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Grid, TextField } from "@mui/material";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { cartArr,catArrWithBasePrice } from "./store";
+import { cartArr, catArrWithBasePrice } from "./store";
 import { useRecoilState } from "recoil";
-
-
-
-// const initialPhoneData = [
-//   { title: 'iPhone 13', price: '$699', basePrice: '$699', quantity: 1, stock: 7 },
-//   { title: 'Samsung Galaxy S21', price: '$799', basePrice: '$799', quantity: 1, stock: 8 },
-//   { title: 'Nokia 69', price: '$499', basePrice: '$499', quantity: 1, stock: 10 },
-//   { title: 'Huawei Mate 50 Pro', price: '$899', basePrice: '$899', quantity: 1, stock: 9 },
-//   // 更多手机...
-// ];
-
 
 
 export const Checkout = () => {
@@ -22,34 +11,8 @@ export const Checkout = () => {
   console.log(phoneData)
   const location = useLocation();
   const data = location.state;
+  const navigate = useNavigate();
 
-  // const initialPhoneData = data.map((item) => {
-  //   return {
-  //     ...item,
-  //     basePrice: item.price, // 将 title 设置为与 _id 相同的值
-  //   };
-  // });
-
-  // const initialPhoneData = JSON.parse(localStorage.getItem('cart') || '[]');
-  // initialPhoneData.forEach((item) => {
-  //   item.basePrice = item.price;
-  // })
-
-
-  //console.log(initialPhoneData);
-
-  // const submitComment = (e, id) => {
-  //     
-  // };
-
-
-  //const [phoneData, setPhoneData] = useState(initialPhoneData);
-
-
-  // const history = useHistory();
-  // useEffect(() => {
-  //   console.log("UseEffect: ", phoneData);
-  // }, []);
 
   const totalPrice = phoneData.reduce((sum, phone) => {
     return sum + parseFloat(phone.price)
@@ -64,15 +27,13 @@ export const Checkout = () => {
 
   const quantityChange = (index, change) => {
     const newPhoneData = [...phoneData];
-    // const basePrice =  newPhoneData[index].price
     const newQuantity = newPhoneData[index].quantity + change;
     const maxStock = newPhoneData[index].stock || Infinity; // Default to Infinity if stock is not provided
 
     if (newQuantity < 1 || newQuantity > maxStock) return; // Do not allow quantity to go below 1 or above stock
-    // newPhoneData[index].quantity = newQuantity;
-    // newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
+
     const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
-    
+
     updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
 
     newPhoneData[index] = updatedPhone;
@@ -90,18 +51,12 @@ export const Checkout = () => {
       }
       return;
     }
-  
+
     if (newQuantity > maxStock) return;
     console.log('input', newQuantity)
     const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
-    
-    updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
 
-    // newPhoneData[index].quantity = newQuantity;
-    // console.log('price');
-    // newPhoneData[index].price = (parseFloat(newPhoneData[index].basePrice) * newQuantity).toFixed(2);
-    // const updatedPhone = { ...newPhoneData[index], quantity: newQuantity };
-    // updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
+    updatedPhone.price = (parseFloat(updatedPhone.basePrice) * newQuantity).toFixed(2);
 
     newPhoneData[index] = updatedPhone;
     setPhoneData(newPhoneData);
@@ -114,13 +69,19 @@ export const Checkout = () => {
       // stocks:stock,
       phone: phoneData,
     }).then(function (response) {
-      console.log(response);
+      // console.log(response);
+      if (response.data.code === 200) {
+        alert('Your payment is successful!');
+      }
+      navigate('/');
+      setPhoneData([]);
     }).catch(function (error) {
       alert(error.response.data.message);
     });
-    setPhoneData([]); // empty data
     console.log('sucess submit');
   };
+
+  
 
   return (
     <Box
@@ -133,16 +94,15 @@ export const Checkout = () => {
         padding: '10px',
       }}
     >
-      <Link to="/">
-        <Button variant="contained" color="primary">
+   
+        <Button variant="contained" color="primary" onClick={()=>navigate('/')}>
           Back
         </Button>
-      </Link>
       <Grid
         container
-        spacing={2} // 设置网格间的间距
+        spacing={2}
         alignItems="center"
-        sx={{ marginTop: '10px' }} // 为了有些间隙在按钮和这行之间
+        sx={{ marginTop: '10px' }}
       >
         {phoneData.map((phone, index) => (
           <Grid container item xs={12} key={index} direction="row">
